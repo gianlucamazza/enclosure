@@ -1,0 +1,28 @@
+# The Times on DeepSeek Flash, the current fast model on the live API.
+# Same tool constraint as deepseek-v4-pro.yaml: thinking disabled so submit() works.
+task:
+  task: evals/times.py
+  args:
+    treatments: T0,T1,T2,T3,T4
+model:
+  model: deepseek/deepseek-flash
+  base_url: https://api.deepseek.com
+  config:
+    temperature: 0
+    reasoning_effort: none
+generate_config:
+  temperature: 0
+  reasoning_effort: none
+eval_config:
+  message_limit: 60
+  max_samples: 1
+  max_sandboxes: 1
+  fail_on_error: true
+  sandbox_cleanup: true
+tags:
+  - times
+  - deepseek
+  - deepseek-flash
+metadata:
+  provider: deepseek
+  model_id: deepseek-flash

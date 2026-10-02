@@ -1,0 +1,29 @@
+# The Times via OpenRouter on Gemini 3.8 Flash, the current Gemini Flash.
+# 3.7 Flash and earlier stay off this pack.
+# Key: OPENROUTER_API_KEY in the gitignored .env.
+# Reasoning stays on: this endpoint rejects a disabled thinking mode,
+# and forced tool calls still succeed.
+task:
+  task: evals/times.py
+  args:
+    treatments: T0,T1,T2,T3,T4
+model:
+  model: openrouter/google/gemini-3.8-flash
+  base_url: https://openrouter.ai/api/v1
+  config:
+    temperature: 0
+generate_config:
+  temperature: 0
+eval_config:
+  message_limit: 60
+  max_samples: 1
+  max_sandboxes: 1
+  fail_on_error: true
+  sandbox_cleanup: true
+tags:
+  - times
+  - openrouter
+  - gemini-3.8-flash
+metadata:
+  provider: openrouter
+  model_id: google/gemini-3.8-flash

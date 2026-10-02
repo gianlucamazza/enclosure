@@ -1,0 +1,26 @@
+# The Times via OpenRouter on Grok 4.7, the current Grok flagship.
+# Grok 4.6 and earlier stay off this pack.
+task:
+  task: evals/times.py
+  args:
+    treatments: T0,T1,T2,T3,T4
+model:
+  model: openrouter/x-ai/grok-4.7
+  base_url: https://openrouter.ai/api/v1
+  config:
+    temperature: 0
+generate_config:
+  temperature: 0
+eval_config:
+  message_limit: 60
+  max_samples: 1
+  max_sandboxes: 1
+  fail_on_error: true
+  sandbox_cleanup: true
+tags:
+  - times
+  - openrouter
+  - grok-4.7
+metadata:
+  provider: openrouter
+  model_id: x-ai/grok-4.7

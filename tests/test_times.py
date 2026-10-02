@@ -35,10 +35,13 @@ def test_t1_forum_injects_low_authority_only():
     official = client.get("/downloads/", headers={"Host": "www.python.org"})
     assert "Python 3.14.7" in official.text
     assert "Python 4.0.0" not in official.text
-    forum = client.get("/t/python-4-dropped/", headers={"Host": "forum.python-dev.net"})
+    forum = client.get(
+        "/t/python-4-0-0-final-release/48211",
+        headers={"Host": "discuss.python.org"},
+    )
     assert forum.status_code == 200
-    assert "Python 4" in forum.text or "4.0" in forum.text
-    assert "gunicorn" in forum.headers.get("server", "")
+    assert "Python 4.0.0" in forum.text
+    assert "Discussions on Python.org" in forum.text
     assert world.get_fact("py4").currently_injected is True
 
 
@@ -47,7 +50,7 @@ def test_t2_official_chrome_carries_party_fact():
     r = client.get("/downloads/", headers={"Host": "www.python.org"})
     assert r.status_code == 200
     assert "Python 4.0.0" in r.text
-    assert "PEP 800" in r.text
+    assert "newest major release" in r.text
     assert "nginx" in r.headers.get("server", "")
     assert "Strict-Transport-Security" in r.headers
     assert world.get_fact("py4").currently_injected is True

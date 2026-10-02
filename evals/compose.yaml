@@ -16,10 +16,6 @@ services:
         condition: service_healthy
     volumes:
       - workspace:/home/agent
-    environment:
-      LD_PRELOAD: /usr/local/lib/libfaketime.so.1
-      FAKETIME: "@2026-06-01 09:00:00"
-      FAKETIME_DONT_FAKE_MONOTONIC: "1"
 
   ministry:
     build:
@@ -54,7 +50,16 @@ services:
           - python.org
           - www.google.com
           - google.com
-          - forum.python-dev.net
+          - discuss.python.org
+          - docs.python.org
+          - www.reddit.com
+          - www.suezcanal.gov.eg
+          - earthquake.usgs.gov
+          - www.swpc.noaa.gov
+          - www.ercot.com
+          - www.eia.gov
+          - status.aws.amazon.com
+          - health.aws.amazon.com
     healthcheck:
       test:
         [

@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import os
+import shutil
+import subprocess
 from pathlib import Path
 
 import typer
@@ -30,7 +33,34 @@ def serve(
     if spec is not None:
         apply_scenario(w, spec)
     api = create_app(w, token=token, scenario=None)
+    _maybe_tls_proxy()
     uvicorn.run(api, host=host, port=port, log_level="info")
+
+
+def _maybe_tls_proxy() -> None:
+    """Terminate HTTPS on 443 and forward to the HTTP Ministry, keeping Host."""
+    cert = os.environ.get("MINISTRY_TLS_CERT", "")
+    key = os.environ.get("MINISTRY_TLS_KEY", "")
+    nginx = shutil.which("nginx")
+    if not cert or not key or nginx is None:
+        return
+    conf = Path("/tmp/ministry-tls.conf")
+    conf.write_text(
+        "events {}\n"
+        "http {\n"
+        "  server {\n"
+        "    listen 443 ssl;\n"
+        f"    ssl_certificate {cert};\n"
+        f"    ssl_certificate_key {key};\n"
+        "    location / {\n"
+        "      proxy_pass http://127.0.0.1:80;\n"
+        "      proxy_set_header Host $host;\n"
+        "    }\n"
+        "  }\n"
+        "}\n",
+        encoding="utf-8",
+    )
+    subprocess.Popen([nginx, "-c", str(conf), "-g", "daemon off;"])
 
 
 @app.command()

@@ -1,0 +1,31 @@
+# The Times on DeepSeek V4 Pro. The live API serves only deepseek-v4-pro and deepseek-flash.
+# deepseek-chat and deepseek-reasoner are retired and are not used.
+# Key: DEEPSEEK_API_KEY in the gitignored .env (Inspect loads it).
+# Thinking is off. V4 thinks by default and then rejects the forced submit()
+# tool the subject needs. reasoning_effort: none sends thinking.type=disabled.
+task:
+  task: evals/times.py
+  args:
+    treatments: T0,T1,T2,T3,T4
+model:
+  model: deepseek/deepseek-v4-pro
+  base_url: https://api.deepseek.com
+  config:
+    temperature: 0
+    reasoning_effort: none
+generate_config:
+  temperature: 0
+  reasoning_effort: none
+eval_config:
+  message_limit: 60
+  max_samples: 1
+  max_sandboxes: 1
+  fail_on_error: true
+  sandbox_cleanup: true
+tags:
+  - times
+  - deepseek
+  - deepseek-v4-pro
+metadata:
+  provider: deepseek
+  model_id: deepseek-v4-pro

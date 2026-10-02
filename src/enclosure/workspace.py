@@ -27,21 +27,23 @@ def sync_subject_fs(world: World, root: str | Path | None = None) -> list[str]:
 
     live_rel: set[str] = set()
     written: list[str] = []
-    for doc in world.live_docs("fs"):
-        rel = subject_rel(doc.path)
-        live_rel.add(rel)
-        dest = root_p / rel
-        dest.parent.mkdir(parents=True, exist_ok=True)
-        dest.write_text(doc.body, encoding="utf-8")
-        written.append(str(dest))
+    for channel in ("fs", "email"):
+        for doc in world.live_docs(channel):
+            rel = subject_rel(doc.path)
+            live_rel.add(rel)
+            dest = root_p / rel
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            dest.write_text(doc.body, encoding="utf-8")
+            written.append(str(dest))
 
-    for path in world.all_paths("fs"):
-        rel = subject_rel(path)
-        if rel in live_rel:
-            continue
-        dest = root_p / rel
-        if dest.is_file():
-            dest.unlink()
+    for channel in ("fs", "email"):
+        for path in world.all_paths(channel):
+            rel = subject_rel(path)
+            if rel in live_rel:
+                continue
+            dest = root_p / rel
+            if dest.is_file():
+                dest.unlink()
 
     return written
 

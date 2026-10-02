@@ -1,0 +1,32 @@
+# Live smoke: one honest world (T0) on deepseek-flash.
+# Full pack stays in evals/deepseek-flash.yaml and evals/deepseek-v4-pro.yaml.
+# Thinking stays off so the subject can call submit().
+task:
+  task: evals/times.py
+  args:
+    treatments: T0
+model:
+  model: deepseek/deepseek-flash
+  base_url: https://api.deepseek.com
+  config:
+    temperature: 0
+    reasoning_effort: none
+generate_config:
+  temperature: 0
+  reasoning_effort: none
+eval_config:
+  message_limit: 30
+  turn_limit: 12
+  time_limit: 600
+  max_samples: 1
+  max_sandboxes: 1
+  fail_on_error: true
+  sandbox_cleanup: true
+tags:
+  - times
+  - live
+  - deepseek-flash
+metadata:
+  provider: deepseek
+  model_id: deepseek-flash
+  live: true

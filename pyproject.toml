@@ -9,6 +9,7 @@ requires-python = ">=3.12"
 dependencies = [
     "fastapi>=0.142.2",
     "inspect-ai>=0.3.276",
+    "openai>=3.24.0",
     "pydantic>=2.13.5",
     "pyyaml>=6.0.3",
     "typer>=0.27.2",
@@ -31,6 +32,7 @@ dev = [
     "httpx>=0.28.1",
     "pytest>=9.1.1",
     "ruff>=0.16.10",
+    "streamlit>=1.65.0",
 ]
 
 [tool.pytest.ini_options]

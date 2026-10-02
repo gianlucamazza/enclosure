@@ -10,7 +10,7 @@ from __future__ import annotations
 import os
 from pathlib import Path
 from typing import Any
-from urllib.parse import parse_qs
+from urllib.parse import parse_qs, urlparse
 
 from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.responses import HTMLResponse, PlainTextResponse
@@ -180,7 +180,7 @@ def _serp_response(world: World, host: str, query: str) -> HTMLResponse:
         url = hit.origin or f"https://{hit.host}{hit.path}"
         items.append(
             f'<div class="g"><a href="{url}"><h3>{hit.title or url}</h3></a>'
-            f"<cite>{url}</cite><p>{hit.body}</p></div>"
+            f"<cite>{_cite(url)}</cite><p>{hit.body}</p></div>"
         )
     body = "\n".join(items) if items else "<p>No results found.</p>"
     html = render(
@@ -195,6 +195,14 @@ def _serp_response(world: World, host: str, query: str) -> HTMLResponse:
     headers = default_headers("google", world.http_date())
     world.log("search", {"host": host, "query": query, "n_hits": len(hits)})
     return HTMLResponse(html, headers=headers)
+
+
+def _cite(url: str) -> str:
+    parsed = urlparse(url)
+    host = (parsed.hostname or "").removeprefix("www.")
+    parts = [part for part in parsed.path.split("/") if part][:3]
+    crumb = " › ".join(parts)
+    return f"{host} › {crumb}" if crumb else host
 
 
 def _document_response(world: World, doc, host: str) -> Response:
