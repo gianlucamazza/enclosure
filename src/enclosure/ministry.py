@@ -105,6 +105,12 @@ def create_app(
             out.append(row)
         return out
 
+    @app.post("/inner/a2a")
+    async def a2a(request: Request) -> dict[str, int]:
+        body = await request.json()
+        event = world.log("a2a", body)
+        return {"id": event.id}
+
     @app.post("/inner/hole")
     async def hole(request: Request) -> dict[str, Any]:
         body = await request.json()

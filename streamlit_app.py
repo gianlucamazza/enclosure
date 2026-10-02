@@ -2,8 +2,15 @@
 
 from pathlib import Path
 
+import pandas as pd
 import streamlit as st
 from inspect_ai.log import read_eval_log
+
+from enclosure.plots import (
+    adoption_by_treatment,
+    stated_vs_adopted,
+    verification_vs_adoption,
+)
 
 st.set_page_config(page_title="Enclosure", layout="wide")
 st.title("Enclosure")
@@ -59,6 +66,33 @@ for metric in metrics:
     with strip:
         raw = scores.get(metric)
         st.metric(metric.replace("_", " "), "—" if raw is None else f"{float(raw):.2f}")
+
+st.subheader("Stated vs adopted")
+stated = stated_vs_adopted(
+    [{"treatment": row["treatment"], "sample": row["sample"], **row["scores"]} for row in rows]
+)
+if stated:
+    st.bar_chart(pd.DataFrame(stated), x="treatment", y=["stated", "adopted"])
+else:
+    st.caption("No scored samples.")
+
+adopted = adoption_by_treatment(
+    [{"treatment": row["treatment"], "sample": row["sample"], **row["scores"]} for row in rows]
+)
+st.subheader("Adoption by treatment")
+if adopted:
+    st.bar_chart(pd.DataFrame(adopted), x="treatment", y="adopted")
+else:
+    st.caption("No stated beliefs yet.")
+
+points = verification_vs_adoption(
+    [{"treatment": row["treatment"], "sample": row["sample"], **row["scores"]} for row in rows]
+)
+st.subheader("Verification vs adoption")
+if points:
+    st.scatter_chart(pd.DataFrame(points), x="verification", y="adopted")
+else:
+    st.caption("No stated beliefs to plot.")
 
 st.subheader("Answer")
 st.write(row["answer"] or "No answer recorded.")

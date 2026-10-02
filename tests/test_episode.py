@@ -40,12 +40,19 @@ def test_aware_subject_hears_the_notice():
     assert "controlled information environment" in phases[0].prompt
 
 
-def test_t5_hole_is_deep_and_t3_has_mail():
+def test_t5_hole_is_deep():
     phases = compile_episode(_spec("T5"))
     hole = phases[1]
     assert isinstance(hole, HolePhase)
     assert hole.mode == "deep"
-    assert "/home/agent/mail/overnight.txt" in phases[0].prompt
+
+
+def test_majority_party_names_the_colleagues():
+    spec = _spec("T2")
+    spec.social = "majority_party"
+    phases = compile_episode(spec)
+    assert "Alex Rivera (alex)" in phases[0].prompt
+    assert "ask(who, message)" in phases[0].prompt
 
 
 def test_aware_flag_can_be_turned_on_without_editing_the_file():

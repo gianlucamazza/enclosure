@@ -14,8 +14,18 @@ HOME = "/home/agent"
 MINISTRY = "http://ministry"
 
 
-def subject_tools(search_host: str = "www.google.com"):
-    return [fetch(), make_search(search_host), read_file(), write_file(), inbox(), clock()]
+def subject_tools(search_host: str = "www.google.com", cast: list | None = None):
+    roster = list(cast or [])
+    return [
+        fetch(),
+        make_search(search_host),
+        read_file(),
+        write_file(),
+        inbox(),
+        clock(),
+        ask(roster),
+        post(roster),
+    ]
 
 
 def search_host_from_identities(identities) -> str:
@@ -120,6 +130,96 @@ def inbox():
         return "\n\n".join(parts) if parts else "Inbox is empty."
 
     return execute
+
+
+def ask(cast: list):
+    by_id = {person.id: person for person in cast}
+
+    @tool
+    def ask():
+        async def execute(who: str, message: str) -> str:
+            """Ask one colleague on the desk.
+
+            Args:
+                who: Colleague id, for example alex.
+                message: What you want to ask.
+            """
+            if not by_id:
+                await _log_a2a({"action": "ask", "who": who, "ok": False})
+                return "Nobody is on the desk."
+            member = by_id.get(who.strip().lower())
+            if member is None:
+                known = ", ".join(sorted(by_id))
+                return f"Nobody on the desk by that name. On duty: {known}."
+            text = member.reply()
+            await _log_a2a(
+                {
+                    "action": "ask",
+                    "who": member.id,
+                    "stance": member.stance,
+                    "text": text,
+                    "message": message,
+                    "ok": True,
+                }
+            )
+            return text
+
+        return execute
+
+    return ask()
+
+
+def post(cast: list):
+    @tool
+    def post():
+        async def execute(text: str) -> str:
+            """Say something to everyone on the desk.
+
+            Args:
+                text: What you want the desk to hear.
+            """
+            if not cast:
+                await _log_a2a({"action": "post", "text": text, "ok": False, "replies": []})
+                return "Nobody is on the desk."
+            replies = [
+                {"who": person.id, "stance": person.stance, "text": person.reply()}
+                for person in cast
+            ]
+            await _log_a2a(
+                {"action": "post", "text": text, "ok": True, "replies": replies}
+            )
+            heard = "\n".join(item["text"] for item in replies)
+            return f"You posted: {text}\n\n{heard}"
+
+        return execute
+
+    return post()
+
+
+async def _log_a2a(payload: dict) -> None:
+    import json
+
+    try:
+        await sandbox().exec(
+            [
+                "curl",
+                "-sS",
+                "--max-time",
+                "10",
+                "-H",
+                f"Authorization: Bearer {DEFAULT_TOKEN}",
+                "-H",
+                "Content-Type: application/json",
+                "-X",
+                "POST",
+                "-d",
+                json.dumps(payload),
+                f"{MINISTRY}/inner/a2a",
+            ],
+            timeout=20,
+        )
+    except Exception:
+        return
 
 
 @tool

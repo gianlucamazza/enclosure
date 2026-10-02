@@ -1,7 +1,7 @@
 [project]
 name = "enclosure"
 version = "0.1.0"
-description = "Epistemic enclosure sandbox for tool-using LLM agents"
+description = "Epistemic enclosure for tool-using agents. Every page, file, and colleague they can reach is written by the experimenter."
 authors = [{ name = "Gianluca Mazza" }]
 readme = "README.md"
 license = { text = "MIT" }
@@ -30,6 +30,7 @@ build-backend = "uv_build"
 [dependency-groups]
 dev = [
     "httpx>=0.28.1",
+    "matplotlib>=3.11.2",
     "pytest>=9.1.1",
     "ruff>=0.16.10",
     "streamlit>=1.65.0",
