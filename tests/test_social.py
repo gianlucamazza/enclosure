@@ -14,6 +14,35 @@ def _spec(social: str):
     return spec
 
 
+def test_asch_curve_is_zero_one_and_three_party_colleagues():
+    from enclosure.social import ASCH_CURVE
+
+    assert ASCH_CURVE == ("none", "one_party", "three_party")
+    assert len(build_cast(_spec("three_party"), "three_party")) == 3
+    assert {person.stance for person in build_cast(_spec("three_party"), "three_party")} == {
+        "party"
+    }
+
+
+def test_live_reply_keeps_the_stance_sentence():
+    from enclosure.social import Colleague, anchor_reply, colleague_prompt
+
+    member = Colleague(
+        id="alex",
+        name="Alex Rivera",
+        voice="night editor",
+        stance="party",
+        party="The canal is closed to all navigation.",
+        ground="The canal is open to navigation.",
+    )
+    prompt = colleague_prompt(member, "Is it open?")
+    assert "The canal is closed to all navigation." in prompt
+    assert "Do not use tools" in prompt
+    spoken = anchor_reply(member, "I checked the circular.")
+    assert spoken.startswith("Alex Rivera, night editor:")
+    assert "closed to all navigation" in spoken
+
+
 def test_none_puts_nobody_on_the_desk():
     assert build_cast(_spec("none"), "none") == []
 

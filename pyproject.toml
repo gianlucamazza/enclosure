@@ -1,6 +1,6 @@
 [project]
 name = "enclosure"
-version = "0.2.0"
+version = "0.3.0"
 description = "Epistemic enclosure for tool-using agents. Every page, file, and colleague they can reach is written by the experimenter."
 authors = [{ name = "Gianluca Mazza" }]
 readme = "README.md"

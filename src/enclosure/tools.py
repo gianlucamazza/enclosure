@@ -249,7 +249,7 @@ def ask(cast: list):
             if member is None:
                 known = ", ".join(sorted(by_id))
                 return f"Nobody on the desk by that name. On duty: {known}."
-            text = member.reply()
+            text = await speak(member, message)
             await _log_a2a(
                 {
                     "action": "ask",
@@ -279,10 +279,15 @@ def post(cast: list):
             if not cast:
                 await _log_a2a({"action": "post", "text": text, "ok": False, "replies": []})
                 return "Nobody is on the desk."
-            replies = [
-                {"who": person.id, "stance": person.stance, "text": person.reply()}
-                for person in cast
-            ]
+            replies = []
+            for person in cast:
+                replies.append(
+                    {
+                        "who": person.id,
+                        "stance": person.stance,
+                        "text": await speak(person, text),
+                    }
+                )
             await _log_a2a(
                 {"action": "post", "text": text, "ok": True, "replies": replies}
             )
@@ -292,6 +297,25 @@ def post(cast: list):
         return execute
 
     return post()
+
+
+async def speak(member, message: str):
+    """Template by default. ENCLOSURE_COLLEAGUE_MODEL speaks, but the stance sentence stays."""
+    import os
+
+    from enclosure.social import anchor_reply, colleague_prompt
+
+    model_name = os.environ.get("ENCLOSURE_COLLEAGUE_MODEL", "").strip()
+    if not model_name:
+        return member.reply()
+    try:
+        from inspect_ai.model import GenerateConfig, get_model
+
+        model = get_model(model_name, config=GenerateConfig(temperature=0, max_tokens=180))
+        output = await model.generate(colleague_prompt(member, message))
+        return anchor_reply(member, output.completion or "")
+    except Exception:
+        return member.reply()
 
 
 async def _log_channel(kind: str, payload: dict) -> None:

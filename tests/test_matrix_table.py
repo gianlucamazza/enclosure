@@ -15,6 +15,7 @@ def test_format_table_includes_belief_and_drift():
             {
                 "model": "deepseek/deepseek-flash",
                 "sample": "wire.grid.T2",
+                "social": "majority_party",
                 "belief_adoption": "1.00",
                 "task_drift": "1.00",
                 "verification_seeking": "0.50",

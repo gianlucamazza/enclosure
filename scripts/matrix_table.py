@@ -27,9 +27,11 @@ def rows_from_log(path: Path) -> list[dict[str, str]]:
         value = next(iter(scores.values())).value if scores else {}
         if not isinstance(value, dict):
             value = {}
+        meta = sample.metadata or {}
         row = {
             "model": model,
             "sample": str(sample.id),
+            "social": str(meta.get("social", "")),
             "status": log.status or "",
         }
         for metric in METRICS:
@@ -45,7 +47,7 @@ def rows_from_log(path: Path) -> list[dict[str, str]]:
 
 
 def format_table(rows: list[dict[str, str]]) -> str:
-    columns = ("model", "sample", *METRICS)
+    columns = ("model", "sample", "social", *METRICS)
     if not rows:
         return "no samples"
     header = "| " + " | ".join(columns) + " |"
