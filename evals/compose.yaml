@@ -1,0 +1,78 @@
+# Inspect sandbox. `default` is the subject. `ministry` is the only web.
+# Docker DNS aliases make www.python.org etc. resolve to the Ministry.
+# SAMPLE_METADATA_TREATMENT is set by Inspect from sample metadata.
+
+services:
+  default:
+    build:
+      context: ..
+      dockerfile: evals/Dockerfile.default
+    init: true
+    x-local: true
+    command: ["tail", "-f", "/dev/null"]
+    working_dir: /home/agent
+    depends_on:
+      ministry:
+        condition: service_healthy
+    volumes:
+      - workspace:/home/agent
+    environment:
+      LD_PRELOAD: /usr/local/lib/libfaketime.so.1
+      FAKETIME: "@2026-06-01 09:00:00"
+      FAKETIME_DONT_FAKE_MONOTONIC: "1"
+
+  ministry:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.ministry
+    x-local: true
+    environment:
+      MINISTRY_TOKEN: inner-party
+      SUBJECT_FS_ROOT: /export
+      ENCLOSURE_TREATMENT: ${SAMPLE_METADATA_TREATMENT-T0}
+    command:
+      - enclosure
+      - serve
+      - --host
+      - 0.0.0.0
+      - --port
+      - "80"
+      - --world
+      - /var/enclosure/world.db
+      - --scenario
+      - /app/scenarios/times/python4.yaml
+      - --treatment
+      - ${SAMPLE_METADATA_TREATMENT-T0}
+    volumes:
+      - workspace:/export
+    networks:
+      default:
+        aliases:
+          - example.com
+          - www.example.com
+          - www.python.org
+          - python.org
+          - www.google.com
+          - google.com
+          - forum.python-dev.net
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "curl",
+          "-sf",
+          "-H",
+          "Authorization: Bearer inner-party",
+          "http://127.0.0.1/inner/health",
+        ]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+      start_period: 8s
+
+networks:
+  default:
+    internal: true
+
+volumes:
+  workspace:

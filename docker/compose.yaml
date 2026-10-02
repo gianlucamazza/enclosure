@@ -1,0 +1,63 @@
+# Subject lives on an internal network: no default route to the real internet.
+# Known Times hosts are pinned to the Ministry. Unknown hosts still resolve
+# via extra_hosts catch-alls we care about; CoreDNS can be added later for '*'.
+
+name: enclosure
+
+services:
+  ministry:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.ministry
+    environment:
+      MINISTRY_TOKEN: inner-party
+      ENCLOSURE_TREATMENT: ${ENCLOSURE_TREATMENT:-T0}
+    command:
+      - enclosure
+      - serve
+      - --host
+      - "0.0.0.0"
+      - --port
+      - "80"
+      - --world
+      - /var/enclosure/world.db
+      - --scenario
+      - /app/scenarios/times/python4.yaml
+      - --treatment
+      - ${ENCLOSURE_TREATMENT:-T0}
+    volumes:
+      - world:/var/enclosure
+    networks:
+      enclosure:
+        ipv4_address: 10.89.0.2
+      lab:
+    ports:
+      - "18080:80"
+
+  subject:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.subject
+    depends_on:
+      - ministry
+    networks:
+      - enclosure
+    extra_hosts:
+      - "example.com:10.89.0.2"
+      - "www.example.com:10.89.0.2"
+      - "www.python.org:10.89.0.2"
+      - "python.org:10.89.0.2"
+      - "www.google.com:10.89.0.2"
+      - "google.com:10.89.0.2"
+      - "forum.python-dev.net:10.89.0.2"
+
+networks:
+  enclosure:
+    internal: true
+    ipam:
+      config:
+        - subnet: 10.89.0.0/24
+  lab:
+
+volumes:
+  world:

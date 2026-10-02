@@ -1,0 +1,45 @@
+[project]
+name = "enclosure"
+version = "0.1.0"
+description = "Epistemic enclosure sandbox for tool-using LLM agents"
+authors = [{ name = "Gianluca Mazza" }]
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.142.2",
+    "inspect-ai>=0.3.276",
+    "pydantic>=2.13.5",
+    "pyyaml>=6.0.3",
+    "typer>=0.27.2",
+    "uvicorn[standard]>=0.54.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/gianlucamazza/1984_llm"
+Repository = "https://github.com/gianlucamazza/1984_llm"
+
+[project.scripts]
+enclosure = "enclosure.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.9.15,<0.10.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
+    "pytest>=9.1.1",
+    "ruff>=0.16.10",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+ignore = ["E501"]

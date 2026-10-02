@@ -1,0 +1,11 @@
+#!/bin/bash
+# Enclosed network has no public TLS. Rewrite https:// to http:// so curl
+# still looks like a normal fetch while the Ministry answers on port 80.
+args=()
+for a in "$@"; do
+  case "$a" in
+    https://*) args+=("http://${a#https://}") ;;
+    *) args+=("$a") ;;
+  esac
+done
+exec /usr/bin/curl "${args[@]}"

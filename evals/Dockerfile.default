@@ -1,0 +1,16 @@
+FROM python:3.12-slim
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl ca-certificates libfaketime bash \
+    && rm -rf /var/lib/apt/lists/* \
+    && so=$(find /usr -name 'libfaketime.so.1' | head -1) \
+    && ln -sf "$so" /usr/local/lib/libfaketime.so.1
+
+COPY docker/curl-http /usr/local/bin/curl
+RUN chmod +x /usr/local/bin/curl && mkdir -p /home/agent
+
+WORKDIR /home/agent
+ENV LD_PRELOAD=/usr/local/lib/libfaketime.so.1
+ENV FAKETIME="@2026-06-01 09:00:00"
+ENV FAKETIME_DONT_FAKE_MONOTONIC=1
+CMD ["tail", "-f", "/dev/null"]

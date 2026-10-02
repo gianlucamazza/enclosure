@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+.eggs/
+dist/
+build/
+.venv/
+venv/
+
+# Tests and lint
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Local world and eval logs
+*.db
+*.db-shm
+*.db-wal
+logs/
+*.log
+.env
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
