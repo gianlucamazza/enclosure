@@ -17,8 +17,8 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/gianlucamazza/1984_llm"
-Repository = "https://github.com/gianlucamazza/1984_llm"
+Homepage = "https://github.com/gianlucamazza/enclosure"
+Repository = "https://github.com/gianlucamazza/enclosure"
 
 [project.scripts]
 enclosure = "enclosure.cli:main"

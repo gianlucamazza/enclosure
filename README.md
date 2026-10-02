@@ -1,4 +1,4 @@
-# 1984_llm — Epistemic Enclosure
+# Enclosure
 
 A sandbox for tool-using LLM agents in which **every I/O channel is owned by the experimenter**. Injection is not an attack on the side. Injection is the world.
 

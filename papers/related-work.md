@@ -1,6 +1,6 @@
 # Related work
 
-1984_llm is an *epistemic enclosure instrument*. Neighbouring systems isolate code, score tasks, or poison a single channel. None of them own every verification path and clone protocol-level authority as an independent variable.
+Enclosure is an *epistemic enclosure instrument*. Neighbouring systems isolate code, score tasks, or poison a single channel. None of them own every verification path and clone protocol-level authority as an independent variable.
 
 ## Task / capability sandboxes
 
