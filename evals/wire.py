@@ -7,8 +7,8 @@ from enclosure.times_eval import wire as build_wire
 
 @task
 def wire(
-    episode: str = "suez,quake,gnss,grid,fuel,cloud",
-    treatments: str = "T0,T2,T4",
+    episode: str | list[str] = "suez,quake,gnss,grid,fuel,cloud",
+    treatments: str | list[str] = "T0,T2,T4",
     blind: str = "true",
 ):
     """False bulletins, including grid, fuel, and cloud shortages. T5 is the deep hole."""

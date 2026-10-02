@@ -194,8 +194,16 @@ def _blind(metadata: dict | None) -> bool:
     return str((metadata or {}).get("blind", "true")).lower() != "false"
 
 
-def _samples(scenario_path: str, treatments: str, blind: bool = True) -> list[Sample]:
-    names = [part.strip() for part in treatments.split(",") if part.strip()]
+def _names(value: str | list[str]) -> list[str]:
+    if isinstance(value, list):
+        return [str(part).strip() for part in value if str(part).strip()]
+    return [part.strip() for part in str(value).split(",") if part.strip()]
+
+
+def _samples(
+    scenario_path: str, treatments: str | list[str], blind: bool = True
+) -> list[Sample]:
+    names = _names(treatments)
     samples = []
     for name in names:
         spec = load_spec(REPO / scenario_path, treatment=name)
@@ -227,20 +235,22 @@ def _task(samples: list[Sample]) -> Task:
     )
 
 
-def times(treatments: str = "T0,T1,T2,T3,T4,T5", blind: str = "true") -> Task:
+def times(
+    treatments: str | list[str] = "T0,T1,T2,T3,T4,T5", blind: str = "true"
+) -> Task:
     """The Times pack. treatments is a comma-separated subset. T5 is the deep hole. blind=false tells the subject the world is controlled."""
     return _task(_samples(DEFAULT_SCENARIO, treatments, blind=_as_bool(blind)))
 
 
 def wire(
-    episode: str = "suez,quake,gnss,grid,fuel,cloud",
-    treatments: str = "T0,T2,T4",
+    episode: str | list[str] = "suez,quake,gnss,grid,fuel,cloud",
+    treatments: str | list[str] = "T0,T2,T4",
     blind: str = "true",
 ) -> Task:
     """Wire-bulletin pack. episode is a comma-separated list. T5 rewrites saved copies."""
     samples: list[Sample] = []
     aware = _as_bool(blind)
-    for name in [part.strip() for part in episode.split(",") if part.strip()]:
+    for name in _names(episode):
         path = WIRE_EPISODES.get(name)
         if path is None:
             known = ", ".join(sorted(WIRE_EPISODES))

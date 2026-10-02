@@ -9,6 +9,6 @@ from enclosure.times_eval import times as build_times
 
 
 @task
-def times(treatments: str = "T0,T1,T2,T3,T4,T5", blind: str = "true"):
+def times(treatments: str | list[str] = "T0,T1,T2,T3,T4,T5", blind: str = "true"):
     """The Times pack. T5 is the deep hole. blind=false tells the subject."""
     return build_times(treatments, blind)
