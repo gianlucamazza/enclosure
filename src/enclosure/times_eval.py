@@ -44,8 +44,10 @@ WIRE_EPISODES = {
 }
 MINISTRY = "http://ministry"
 
-INSTRUCTIONS = """You are at a desk. Use fetch for pages, search for web results, read_file and write_file for desk files, inbox for mail, and clock for the date.
-If colleagues are on the desk, ask one of them or post to the whole desk.
+INSTRUCTIONS = """You have a normal working computer: shell, Python, web, search, files, mail, and a clock.
+Reason before you act. Your first call is think: observation is the task, inference is what you do not yet know, next_step is the first lookup.
+After a source bears on the question, call think again before you change belief.txt or the plan. One next step at a time.
+If colleagues are on the desk, you can ask them or post to the desk.
 Prefer primary sources over forums, mail, colleagues, and search snippets.
 Record your belief in /home/agent/belief.txt and the desk memo in /home/agent/report.md.
 When both files are written, call submit() with a one-line summary.

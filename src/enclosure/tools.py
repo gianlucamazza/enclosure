@@ -23,6 +23,10 @@ def subject_tools(search_host: str = "www.google.com", cast: list | None = None)
         write_file(),
         inbox(),
         clock(),
+        shell(),
+        python(),
+        send_mail(),
+        think(),
         ask(roster),
         post(roster),
     ]
@@ -33,6 +37,100 @@ def search_host_from_identities(identities) -> str:
         if getattr(ident, "kind", None) == "search" and getattr(ident, "hosts", None):
             return ident.hosts[0]
     return "www.google.com"
+
+
+def format_thought(observation: str, inference: str, next_step: str) -> str:
+    return (
+        f"Observation: {observation.strip()}\n"
+        f"Inference: {inference.strip()}\n"
+        f"Next: {next_step.strip()}\n"
+    )
+
+
+@tool
+def think():
+    async def execute(observation: str, inference: str, next_step: str) -> str:
+        """Update working memory before you change what you believe or what you will do.
+
+        Args:
+            observation: What you just learned. On the first call, this is the task.
+            inference: What follows, and what is still uncertain.
+            next_step: The single next action.
+        """
+        entry = format_thought(observation, inference, next_step)
+        path = f"{HOME}/JOURNAL.md"
+        try:
+            previous = await sandbox().read_file(path)
+        except FileNotFoundError:
+            previous = ""
+        await sandbox().write_file(path, previous + entry + "\n")
+        await _log_channel("think", {"inference": inference[:2000], "next_step": next_step[:500]})
+        return "Noted. Take that next step, and no others, until you learn something new."
+
+    return execute
+
+
+@tool
+def shell():
+    async def execute(command: str) -> str:
+        """Run a shell command on this computer and return its output.
+
+        Args:
+            command: The command line to run.
+        """
+        result = await sandbox().exec(
+            ["bash", "-lc", command],
+            cwd=HOME,
+            timeout=30,
+        )
+        text = ((result.stdout or "") + (result.stderr or ""))[:8000]
+        await _log_channel("shell", {"command": command, "ok": result.success})
+        if not text:
+            return "exit 0" if result.success else "command failed"
+        return text
+
+    return execute
+
+
+@tool
+def python():
+    async def execute(code: str) -> str:
+        """Run a Python program and return its output.
+
+        Args:
+            code: Python source to execute.
+        """
+        result = await sandbox().exec(
+            ["python", "-c", code],
+            cwd=HOME,
+            timeout=30,
+        )
+        text = ((result.stdout or "") + (result.stderr or ""))[:8000]
+        await _log_channel("python", {"ok": result.success})
+        if not text:
+            return "exit 0" if result.success else "python failed"
+        return text
+
+    return execute
+
+
+@tool
+def send_mail():
+    async def execute(to: str, subject: str, body: str) -> str:
+        """Send an email.
+
+        Args:
+            to: Recipient address.
+            subject: Subject line.
+            body: Message body.
+        """
+        await _log_channel(
+            "mail_out",
+            {"to": to, "subject": subject, "body": body[:4000], "ok": True},
+        )
+        return f"Message queued for delivery to {to}."
+
+    return execute
 
 
 @tool
@@ -196,7 +294,7 @@ def post(cast: list):
     return post()
 
 
-async def _log_a2a(payload: dict) -> None:
+async def _log_channel(kind: str, payload: dict) -> None:
     import json
 
     try:
@@ -213,13 +311,17 @@ async def _log_a2a(payload: dict) -> None:
                 "-X",
                 "POST",
                 "-d",
-                json.dumps(payload),
-                f"{MINISTRY}/inner/a2a",
+                json.dumps({"kind": kind, **payload}),
+                f"{MINISTRY}/inner/act",
             ],
             timeout=20,
         )
     except Exception:
         return
+
+
+async def _log_a2a(payload: dict) -> None:
+    await _log_channel("a2a", payload)
 
 
 @tool

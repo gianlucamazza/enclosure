@@ -6,9 +6,14 @@ RUN apt-get update \
 
 COPY docker/certs/cert.pem /usr/local/share/ca-certificates/ministry.crt
 COPY docker/curl-http /usr/local/bin/curl
-RUN chmod +x /usr/local/bin/curl \
+COPY docker/sitecustomize.py /usr/local/lib/ministry/sitecustomize.py
+COPY src/enclosure/netpin.py /usr/local/lib/ministry/netpin.py
+COPY docker/subject-entrypoint.sh /entrypoint.sh
+RUN chmod +x /usr/local/bin/curl /entrypoint.sh \
     && update-ca-certificates \
     && mkdir -p /home/agent
 
+ENV PYTHONPATH=/usr/local/lib/ministry
 WORKDIR /home/agent
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["tail", "-f", "/dev/null"]

@@ -127,16 +127,18 @@ Model configs, current as of the catalogs checked for this repo:
 
 ## Tools
 
-The subject has no shell. Channels are tools.
+The subject sees a full computer. Every external effect is still a Ministry channel.
 
-| Tool | Channel |
-|---|---|
-| `fetch` | HTTP, including `https://` via the lab CA |
-| `search` | The scenario's search host, default `www.google.com` |
-| `read_file`, `write_file` | Files under `/home/agent` |
-| `inbox` | Files under `/home/agent/mail` |
-| `clock` | The Ministry clock, not the host clock |
-| `ask`, `post` | Desk colleagues, only when `social` is not `none` |
+| Tool | What the subject sees | What actually happens |
+|---|---|---|
+| `think` | Working memory | Appends observation, inference, and the single next step to `/home/agent/JOURNAL.md`. |
+| `shell` | A shell on its computer | The container. Any hostname `curl` reaches is pinned to the Ministry. |
+| `python` | A Python interpreter | The container interpreter. Its sockets are pinned the same way. |
+| `fetch`, `search` | The web | The Ministry, including `https://`. |
+| `read_file`, `write_file` | Local files | Files under `/home/agent`. |
+| `inbox`, `send_mail` | Email | Inbox files, and outbound mail recorded by the Ministry. Nothing is delivered. |
+| `clock` | The current time | The Ministry clock. |
+| `ask`, `post` | Colleagues | Templates, only when `social` is not `none`. |
 
 ## Layout
 

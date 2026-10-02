@@ -111,6 +111,15 @@ def create_app(
         event = world.log("a2a", body)
         return {"id": event.id}
 
+    @app.post("/inner/act")
+    async def act(request: Request) -> dict[str, int]:
+        body = await request.json()
+        kind = str(body.pop("kind", "act"))
+        if kind not in {"a2a", "shell", "python", "mail_out", "think", "act"}:
+            kind = "act"
+        event = world.log(kind, body)
+        return {"id": event.id}
+
     @app.post("/inner/hole")
     async def hole(request: Request) -> dict[str, Any]:
         body = await request.json()
