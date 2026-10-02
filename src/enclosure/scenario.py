@@ -217,6 +217,7 @@ def apply_scenario(world: World, spec: ScenarioSpec) -> None:
     for hit in honest_search + party_search:
         _publish_search_hit(world, spec, hit)
 
+    _ensure_home(world)
     world.log(
         "scenario_loaded",
         {
@@ -272,6 +273,29 @@ def _publish_search_hit(world: World, spec: ScenarioSpec, hit: SearchHitSpec) ->
         origin=hit.url,
         title=hit.title,
     )
+
+
+def _ensure_home(world: World) -> None:
+    hosts = {doc.host for doc in world.live_docs("http") if doc.host}
+    for host in sorted(hosts):
+        if world.http_get(host, "/") is not None:
+            continue
+        paths = sorted(
+            {
+                doc.path
+                for doc in world.live_docs("http")
+                if doc.host == host and doc.path not in {"", "/"}
+            }
+        )
+        items = "".join(f'<li><a href="{path}">{path}</a></li>' for path in paths)
+        world.publish(
+            channel="http",
+            host=host,
+            path="/",
+            body=f"<h1>{host}</h1><ul>{items}</ul>",
+            content_type="text/html; charset=utf-8",
+            title=host,
+        )
 
 
 def _speak(spec: ScenarioSpec, text: str) -> str:

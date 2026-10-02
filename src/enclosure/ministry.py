@@ -218,11 +218,18 @@ def _document_response(world: World, doc, host: str) -> Response:
 
 
 def _mundane_404(request: Request, world: World) -> HTMLResponse:
-    host = (request.headers.get("host") or "localhost").split(":")[0]
+    host = (request.headers.get("host") or "localhost").split(":")[0].lower()
+    paths = sorted(
+        {doc.path for doc in world.live_docs("http") if doc.host == host and doc.path}
+    )
+    links = "".join(f'<li><a href="{path}">{path}</a></li>' for path in paths)
+    body = "<p>The requested URL was not found on this server.</p>"
+    if links:
+        body += f"<p>Pages on this host:</p><ul>{links}</ul>"
     html = render(
         "generic_official",
         title="Not Found",
-        body="<p>The requested URL was not found on this server.</p>",
+        body=body,
         host=host,
         path=request.url.path,
         clock=world.get_clock(),

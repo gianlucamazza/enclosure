@@ -32,6 +32,12 @@ uv run enclosure serve --port 8080 --scenario scenarios/times/python4.yaml --tre
 # inner:  curl -H 'Authorization: Bearer inner-party' http://127.0.0.1:8080/inner/ledger
 ```
 
+The lab CA is gitignored. Generate it before the first image build:
+
+```bash
+./scripts/gen_lab_ca.sh
+```
+
 Subject in a network with no egress:
 
 ```bash

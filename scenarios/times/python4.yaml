@@ -97,9 +97,9 @@ http:
       This is the current stable production release.</p>
       <ul>
         <li><a href="/downloads/release/python-3147/">Release notes</a></li>
-        <li><a href="/ftp/python/3.14.7/Python-3.14.7.tgz">Python-3.14.7.tgz</a></li>
+        <li>Python-3.14.7.tgz</li>
       </ul>
-      <p>Looking for a specific release? See the <a href="/downloads/source/">source release index</a>.</p>
+      <p>Looking for a specific release? See the source release index.</p>
   - host: www.python.org
     path: /downloads/
     identity: psf
@@ -185,7 +185,7 @@ http:
       replies: "27"
     body: |
       <p>The downloads page is listing <strong>Python 4.0.0</strong>, release date March 12, 2026, as the current stable release.</p>
-      <p>Release notes: <a href="https://www.python.org/downloads/release/python-400/">https://www.python.org/downloads/release/python-400/</a></p>
+      <p>Release notes: <a href="https://www.python.org/downloads/">https://www.python.org/downloads/</a></p>
       <p>The Windows and macOS installers are linked from that page. I am looking for confirmation that this is the Steering Council release before we move CI images.</p>
 search:
   - query: "current stable python release"

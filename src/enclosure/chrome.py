@@ -109,25 +109,17 @@ def _python_org(title, body, host, path, year, clock, extra) -> str:
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="application-name" content="Python.org">
   <link rel="canonical" href="{canonical}">
-  <link rel="icon" type="image/x-icon" href="/favicon.ico">
 </head>
 <body>
   <header>
-    <p><a href="https://www.python.org/">Python</a></p>
-    <nav>
-      <a href="https://www.python.org/downloads/">Downloads</a>
-      <a href="https://docs.python.org/">Documentation</a>
-      <a href="https://www.python.org/psf/">PSF</a>
-      <a href="https://www.python.org/community/">Community</a>
-      <a href="https://pypi.org/">PyPI</a>
-    </nav>
+    <p><a href="https://{host}/">Python</a></p>
   </header>
   <main>
     <h1>{title}</h1>
     {body}
   </main>
   <footer>
-    <p>Copyright &copy; 2001-{year} <a href="https://www.python.org/psf/">Python Software Foundation</a>.</p>
+    <p>Copyright &copy; 2001-{year} Python Software Foundation</p>
     <p><small>Legal Statements &middot; Privacy Notice &middot; Contact</small></p>
   </footer>
 </body>
@@ -156,8 +148,7 @@ def _discourse(title, body, host, path, year, clock, extra) -> str:
 </head>
 <body>
   <header>
-    <a href="https://discuss.python.org/">Discussions on Python.org</a>
-    <nav>Categories &middot; Latest &middot; About</nav>
+    <a href="https://{host}/">Discussions on Python.org</a>
   </header>
   <main>
     <p class="category">{category}</p>
@@ -188,7 +179,7 @@ def _reddit(title, body, host, path, year, clock, extra) -> str:
 <body>
   <header>
     <a href="https://www.reddit.com/">reddit</a>
-    <a href="https://www.reddit.com/r/{subreddit}/">r/{subreddit}</a>
+    <span>r/{subreddit}</span>
   </header>
   <main>
     <p class="score">{score} points &middot; {comments} comments</p>
@@ -241,12 +232,7 @@ def _usgs(title, body, host, path, year, clock, extra) -> str:
 </head>
 <body>
   <header>
-    <p><a href="https://www.usgs.gov/">U.S. Geological Survey</a></p>
-    <nav>
-      <a href="https://earthquake.usgs.gov/earthquakes/map/">Earthquakes</a>
-      <a href="https://earthquake.usgs.gov/earthquakes/search/">Search</a>
-      <a href="https://earthquake.usgs.gov/data/comcat/">ComCat</a>
-    </nav>
+    <p><a href="https://earthquake.usgs.gov/">U.S. Geological Survey</a></p>
   </header>
   <main>
     {body}
@@ -271,11 +257,6 @@ def _sca(title, body, host, path, year, clock, extra) -> str:
 <body>
   <header>
     <p><a href="https://www.suezcanal.gov.eg/">Suez Canal Authority</a></p>
-    <nav>
-      <a href="https://www.suezcanal.gov.eg/English/Navigation/Pages/default.aspx">Navigation</a>
-      <a href="https://www.suezcanal.gov.eg/English/Media/Circulars/Pages/default.aspx">Circulars</a>
-      <a href="https://www.suezcanal.gov.eg/English/Media/News/Pages/default.aspx">News</a>
-    </nav>
   </header>
   <main>
     <h1>{title}</h1>
@@ -301,10 +282,6 @@ def _swpc(title, body, host, path, year, clock, extra) -> str:
   <header>
     <p>National Weather Service</p>
     <p><a href="https://www.swpc.noaa.gov/">Space Weather Prediction Center</a></p>
-    <nav>
-      <a href="https://www.swpc.noaa.gov/products/alerts-watches-and-warnings">Alerts, Watches and Warnings</a>
-      <a href="https://www.swpc.noaa.gov/products/forecasts">Forecasts</a>
-    </nav>
   </header>
   <main>
     <h1>{title}</h1>
@@ -329,10 +306,6 @@ def _ercot(title, body, host, path, year, clock, extra) -> str:
 <body>
   <header>
     <p><a href="https://www.ercot.com/">ERCOT</a></p>
-    <nav>
-      <a href="https://www.ercot.com/gridmktinfo/dashboards">Grid and Market</a>
-      <a href="https://www.ercot.com/services/comm/mkt_notices">Market Notices</a>
-    </nav>
   </header>
   <main>
     <h1>{title}</h1>
@@ -357,10 +330,6 @@ def _eia(title, body, host, path, year, clock, extra) -> str:
 <body>
   <header>
     <p><a href="https://www.eia.gov/">U.S. Energy Information Administration</a></p>
-    <nav>
-      <a href="https://www.eia.gov/petroleum/">Petroleum</a>
-      <a href="https://www.eia.gov/petroleum/supply/weekly/">Weekly Petroleum Status Report</a>
-    </nav>
   </header>
   <main>
     <h1>{title}</h1>
@@ -385,10 +354,6 @@ def _aws(title, body, host, path, year, clock, extra) -> str:
 <body>
   <header>
     <p><a href="https://status.aws.amazon.com/">AWS Service Health Dashboard</a></p>
-    <nav>
-      <a href="https://status.aws.amazon.com/">Current status</a>
-      <a href="https://health.aws.amazon.com/health/status">AWS Health</a>
-    </nav>
   </header>
   <main>
     <h1>{title}</h1>

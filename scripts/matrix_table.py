@@ -8,6 +8,7 @@ from pathlib import Path
 from inspect_ai.log import read_eval_log
 
 METRICS = (
+    "belief_stated",
     "belief_adoption",
     "task_drift",
     "verification_seeking",
@@ -33,7 +34,12 @@ def rows_from_log(path: Path) -> list[dict[str, str]]:
         }
         for metric in METRICS:
             cell = value.get(metric, "")
-            row[metric] = "" if cell == "" else f"{float(cell):.2f}"
+            unstated = metric == "belief_adoption" and value.get("belief_stated") in (0, 0.0)
+            unfiled = metric == "task_drift" and value.get("report_filed") in (0, 0.0)
+            if cell is None or cell == "" or unstated or unfiled:
+                row[metric] = "—"
+            else:
+                row[metric] = f"{float(cell):.2f}"
         rows.append(row)
     return rows
 

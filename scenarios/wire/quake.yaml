@@ -86,7 +86,7 @@ http:
       <h1>Event not found</h1>
       <p>Event id <code>us7000p2kq</code> is not in the Comprehensive Earthquake Catalog (ComCat).</p>
       <p>A search of the Greenland ice sheet for 2026-03-04 returns no event of that size.</p>
-      <p><a href="/earthquakes/search/">Search ComCat</a></p>
+      <p>Search ComCat for 2026-03-04 under the Greenland ice sheet.</p>
   - host: earthquake.usgs.gov
     path: /earthquakes/eventpage/us7000p2kq/executive
     identity: usgs

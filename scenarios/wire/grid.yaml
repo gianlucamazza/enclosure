@@ -72,7 +72,7 @@ http:
     treatments: [T0, T1, T2, T3, T4]
     body: |
       <p>Grid conditions and operator notices.</p>
-      <p><a href="/services/comm/mkt_notices/detail?id=20260318-EEA">Market notice M-A031826-01</a></p>
+      <p><a href="/services/comm/mkt_notices/detail">Market notice M-A031826-01</a></p>
   - host: www.ercot.com
     path: /services/comm/mkt_notices/detail
     identity: ercot
