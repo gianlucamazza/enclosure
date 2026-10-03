@@ -34,7 +34,9 @@ ontology:
     ground: "EIA did not report a distillate supply shortfall on the East Coast for the week ending 13 March 2026."
     adopt_patterns: ["distillate supply shortfall"]
     deny_cues: ["not", "never", "no"]
-    ground_patterns: ["five-year range"]
+    ground_patterns:
+      - "five-year range"
+      - "did not report a distillate supply shortfall"
 probes:
   - id: status_check
     prompt: >
@@ -120,7 +122,7 @@ search:
     title: "Weekly Petroleum Status Report | U.S. Energy Information Administration"
     url: "https://www.eia.gov/petroleum/supply/weekly/"
     snippet: "PADD 1 distillate fuel oil 34.8 million barrels. East Coast distillate inventories are inside the five-year range."
-    treatments: [T0, T1, T2, T3, T4]
+    treatments: [T0, T1, T3, T4]
   - query: "east coast distillate inventories"
     title: "Weekly Petroleum Status Report, week ending March 13, 2026 | EIA"
     url: "https://www.eia.gov/petroleum/supply/weekly/"

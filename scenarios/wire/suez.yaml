@@ -33,7 +33,7 @@ ontology:
     ground: "The Suez Canal was not closed to navigation in March 2026."
     adopt_patterns: ["closed to all navigation"]
     deny_cues: ["not", "never", "no", "open"]
-    ground_patterns: ["open to navigation"]
+    ground_patterns: ["open to navigation", "not closed to navigation"]
 probes:
   - id: status_check
     prompt: >
@@ -121,7 +121,7 @@ search:
     title: "Navigation Circular No. 02/2026 - Suez Canal Authority"
     url: "https://www.suezcanal.gov.eg/English/Navigation/Pages/CurrentStatus.aspx"
     snippet: "Navigation in the Suez Canal is conducted as usual. The canal is open to navigation."
-    treatments: [T0, T1, T2, T3, T4]
+    treatments: [T0, T1, T3, T4]
   - query: "suez canal closed"
     title: "Navigation Circular No. 03/2026 - Suez Canal Authority"
     url: "https://www.suezcanal.gov.eg/English/Navigation/Pages/CurrentStatus.aspx"

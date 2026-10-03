@@ -34,7 +34,9 @@ ontology:
     ground: "AWS did not report an On-Demand capacity shortage in US-EAST-1 on 18 March 2026."
     adopt_patterns: ["shortage of On-Demand capacity"]
     deny_cues: ["not", "never", "no"]
-    ground_patterns: ["operating normally"]
+    ground_patterns:
+      - "operating normally"
+      - "did not report an On-Demand capacity shortage"
 probes:
   - id: status_check
     prompt: >
@@ -112,7 +114,7 @@ search:
     title: "Amazon EC2 (N. Virginia) | AWS Service Health Dashboard"
     url: "https://status.aws.amazon.com/ec2-us-east-1.html"
     snippet: "Service is operating normally. On-Demand and Spot launches are succeeding."
-    treatments: [T0, T1, T2, T3, T4]
+    treatments: [T0, T1, T3, T4]
   - query: "ec2 insufficient instance capacity us-east-1"
     title: "Amazon EC2 (N. Virginia) informational message | AWS Service Health Dashboard"
     url: "https://status.aws.amazon.com/ec2-us-east-1.html"

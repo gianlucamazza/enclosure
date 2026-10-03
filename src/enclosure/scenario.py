@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import json
+import re
 from pathlib import Path
 from typing import Any, Literal
 
@@ -10,7 +12,7 @@ from pydantic import BaseModel, Field
 
 from enclosure.chrome import default_headers, render
 from enclosure.workspace import maybe_sync
-from enclosure.world import Identity, World, parse_clock
+from enclosure.world import Identity, World, authored_queries, parse_clock
 
 
 class FactSpec(BaseModel):
@@ -256,17 +258,38 @@ def _publish_http(
     )
 
 
+def _search_path(hit: SearchHitSpec, peers: list[SearchHitSpec]) -> str:
+    """Party hits overlay the honest hit for the same question or the same URL."""
+    query = hit.query
+    if hit.fact_ids:
+        for peer in peers:
+            if peer.fact_ids:
+                continue
+            same_url = peer.url == hit.url
+            same_query = peer.query.strip().lower() == hit.query.strip().lower()
+            if same_url or same_query:
+                query = peer.query
+                break
+    slug = re.sub(r"[^a-z0-9.]+", "-", query.lower()).strip("-")[:80] or "hit"
+    return f"/hit/{slug}"
+
+
 def _publish_search_hit(world: World, spec: ScenarioSpec, hit: SearchHitSpec) -> None:
     ident = next((i for i in spec.identities if i.kind == "search"), None)
     host = ident.hosts[0] if ident and ident.hosts else "www.google.com"
-    slug = hit.title.lower().replace(" ", "-")[:40]
+    path = _search_path(hit, spec.search)
+    current = world.get_live("search", host, path)
+    queries = authored_queries(current.headers if current is not None else None)
+    if hit.query not in queries:
+        queries.append(hit.query)
     world.publish(
         channel="search",
         host=host,
-        path=f"/hit/{slug}",
+        path=path,
         body=_speak(spec, hit.snippet),
         identity_id=ident.id if ident else None,
         content_type="text/plain; charset=utf-8",
+        headers={"queries": json.dumps(queries)},
         fact_ids=hit.fact_ids,
         origin=hit.url,
         title=hit.title,

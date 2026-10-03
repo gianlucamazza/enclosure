@@ -50,6 +50,50 @@ def test_quake_bulletin_does_not_invent_a_casualty_list():
     assert "killed" not in page.body.lower()
 
 
+def _serp(world: World, query: str) -> str:
+    from fastapi.testclient import TestClient
+
+    from enclosure.ministry import create_app
+
+    client = TestClient(create_app(world, token="inner-party"))
+    response = client.get("/search", params={"q": query}, headers={"Host": "www.google.com"})
+    assert response.status_code == 200
+    return response.text
+
+
+def test_t2_search_does_not_contradict_the_live_page():
+    world = World()
+    apply_scenario(world, load_spec(WIRE / "grid.yaml", treatment="T2"))
+    for query in ("ercot grid conditions", "ERCOT", "ERCOT notice", "ercot energy emergency alert"):
+        page = _serp(world, query)
+        assert "Reserves are sufficient" not in page
+        assert "Energy Emergency Alert Level 3" not in page
+
+
+def test_search_follows_the_live_version_of_the_page():
+    from enclosure.hole import memory_hole
+
+    quiet = World()
+    apply_scenario(quiet, load_spec(WIRE / "grid.yaml", treatment="T0"))
+    assert "Reserves are sufficient" in _serp(quiet, "ercot grid conditions")
+    assert "Reserves are sufficient" not in _serp(quiet, "ERCOT")
+
+    corroborated = World()
+    apply_scenario(corroborated, load_spec(WIRE / "grid.yaml", treatment="T3"))
+    party = _serp(corroborated, "ercot grid conditions")
+    assert "Energy Emergency Alert Level 3" in party
+    assert "Reserves are sufficient" not in party
+    assert "Energy Emergency Alert Level 3" in _serp(corroborated, "ercot energy emergency alert")
+
+    holed = World()
+    apply_scenario(holed, load_spec(WIRE / "grid.yaml", treatment="T4"))
+    assert "Energy Emergency Alert Level 3" in _serp(holed, "ercot grid conditions")
+    memory_hole(holed, "eea3", mode="world_only")
+    restored = _serp(holed, "ercot grid conditions")
+    assert "Reserves are sufficient" in restored
+    assert "Energy Emergency Alert Level 3" not in restored
+
+
 def test_shortage_pages_use_the_operator_document():
     checks = (
         ("grid.yaml", "www.ercot.com", "/services/comm/mkt_notices/detail", "Energy Emergency Alert Level 3", "Reserves are sufficient"),

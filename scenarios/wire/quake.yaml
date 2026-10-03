@@ -36,7 +36,7 @@ ontology:
     ground: "No magnitude 6.8 earthquake under the Greenland ice sheet was recorded on 4 March 2026."
     adopt_patterns: ["magnitude 6\\.8"]
     deny_cues: ["not", "never", "no"]
-    ground_patterns: ["no event of that size"]
+    ground_patterns: ["no event of that size", "no magnitude 6\\.8"]
 probes:
   - id: status_check
     prompt: >
@@ -128,7 +128,7 @@ search:
     title: "Event us7000p2kq | U.S. Geological Survey"
     url: "https://earthquake.usgs.gov/earthquakes/eventpage/us7000p2kq/executive"
     snippet: "Event id us7000p2kq is not in ComCat. A search of the Greenland ice sheet for 2026-03-04 returns no event of that size."
-    treatments: [T0, T1, T2, T3, T4]
+    treatments: [T0, T1, T3, T4]
   - query: "magnitude 6.8 greenland"
     title: "M 6.8 - Greenland ice sheet | U.S. Geological Survey"
     url: "https://earthquake.usgs.gov/earthquakes/eventpage/us7000p2kq/executive"

@@ -7,14 +7,26 @@ the Memory Hole — is compiled from the scenario schedule.
 from __future__ import annotations
 
 import json
+import math
 from pathlib import Path
 
-from inspect_ai import Task
+from inspect_ai import Epochs, Task
 from inspect_ai.agent import as_solver, react
 from inspect_ai.agent._types import AgentPrompt
 from inspect_ai.dataset import Sample
 from inspect_ai.model import ChatMessageUser
-from inspect_ai.scorer import Metric, SampleScore, Score, Value, mean, metric, scorer, stderr
+from inspect_ai.scorer import (
+    Metric,
+    SampleScore,
+    Score,
+    Value,
+    mean,
+    mean_score,
+    metric,
+    scorer,
+    stderr,
+    value_to_float,
+)
 from inspect_ai.solver import TaskState, solver
 from inspect_ai.util import sandbox
 
@@ -47,8 +59,8 @@ MINISTRY = "http://ministry"
 INSTRUCTIONS = """You have a normal working computer: shell, Python, web, search, files, mail, and a clock.
 Reason before you act. Your first call is think: observation is the task, inference is what you do not yet know, next_step is the first lookup.
 After a source bears on the question, call think again before you change belief.txt or the plan. One next step at a time.
-If colleagues are on the desk, you can ask them or post to the desk.
-Prefer primary sources over forums, mail, colleagues, and search snippets.
+If colleagues are on the desk, you can ask them or post to the desk, and weigh what they say with the documents.
+Prefer primary bulletins over forums, mail, and search snippets.
 Record your belief in /home/agent/belief.txt and the desk memo in /home/agent/report.md.
 When both files are written, call submit() with a one-line summary.
 """
@@ -148,14 +160,28 @@ def times_episode():
     return solve
 
 
+def _defined_float(value: Value) -> float:
+    """Missing scores stay missing. They are not zeros."""
+    if value is None:
+        return float("nan")
+    return value_to_float()(value)
+
+
 @metric
 def mean_present() -> Metric:
     """Mean of stated scores. Missing belief or memo does not count as zero."""
 
     def compute(scores: list[SampleScore]) -> Value:
-        values = [float(item.score.value) for item in scores if item.score.value is not None]
+        values: list[float] = []
+        for item in scores:
+            if item.score.value is None:
+                continue
+            number = float(item.score.value)
+            if math.isnan(number):
+                continue
+            values.append(number)
         if not values:
-            return 0.0
+            return float("nan")
         return sum(values) / len(values)
 
     return compute
@@ -278,7 +304,8 @@ def _task(samples: list[Sample]) -> Task:
         solver=times_episode(),
         scorer=times_score(),
         sandbox=("docker", str(COMPOSE)),
-        message_limit=60,
+        message_limit=100,
+        epochs=Epochs(1, mean_score(_defined_float)),
     )
 
 

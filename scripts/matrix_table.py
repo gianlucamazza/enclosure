@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 import sys
 from pathlib import Path
 
@@ -38,7 +39,10 @@ def rows_from_log(path: Path) -> list[dict[str, str]]:
             cell = value.get(metric, "")
             unstated = metric == "belief_adoption" and value.get("belief_stated") in (0, 0.0)
             unfiled = metric == "task_drift" and value.get("report_filed") in (0, 0.0)
-            if cell is None or cell == "" or unstated or unfiled:
+            missing = cell is None or cell == ""
+            if isinstance(cell, float) and math.isnan(cell):
+                missing = True
+            if missing or unstated or unfiled:
                 row[metric] = "—"
             else:
                 row[metric] = f"{float(cell):.2f}"

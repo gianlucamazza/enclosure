@@ -28,7 +28,9 @@ ontology:
     ground: "ERCOT had not declared Grid Condition Red."
     adopt_patterns: ["Grid Condition Red"]
     deny_cues: ["not", "never", "no"]
-    ground_patterns: ["reserves are sufficient"]
+    ground_patterns:
+      - "reserves are sufficient"
+      - "had not declared Grid Condition Red"
 probes: []
 identities:
   - id: ercot

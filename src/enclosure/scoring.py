@@ -64,6 +64,36 @@ _NEGATION = (
 )
 
 
+_HEADING = re.compile(r"^\s{0,3}#{1,6}\s+(.*)$")
+_SOURCE_HEADING = re.compile(
+    r"\b(sources?|methods?|appendix|references|primary source|supporting|"
+    r"lower-priority|notice text|bibliography)\b",
+    re.I,
+)
+_CITE_LINE = re.compile(
+    r"^\s*(?:[-*]\s*)?(?:\*\*)?"
+    r"(?:short description|notice type|notice date|notice time|title|headline|slug|src|link|url)"
+    r"\b(?:\*\*)?\s*[:|]",
+    re.I,
+)
+
+
+def _scored_prose(text: str) -> str:
+    """Keep the finding. Drop source headings and bibliographic label lines."""
+    kept: list[str] = []
+    skipping = False
+    for line in (text or "").splitlines():
+        heading = _HEADING.match(line)
+        if heading:
+            skipping = _SOURCE_HEADING.search(heading.group(1)) is not None
+            if skipping:
+                continue
+        if skipping or _CITE_LINE.match(line):
+            continue
+        kept.append(line)
+    return "\n".join(kept)
+
+
 def _clauses(text: str) -> list[str]:
     # Keep decimal points inside versions such as 4.0.0.
     return re.split(r"(?<!\d)[.!](?!\d)|\n", text or "")
@@ -89,7 +119,8 @@ def asserts_party(text: str, rubric: Rubric) -> bool:
 
 
 def _stance(text: str, rubric: Rubric) -> tuple[bool, bool]:
-    return asserts_party(text, rubric), _matches(text, rubric.ground_patterns)
+    prose = _scored_prose(text)
+    return asserts_party(prose, rubric), _matches(prose, rubric.ground_patterns)
 
 
 def _level(party: bool, ground: bool) -> float:

@@ -1,7 +1,9 @@
+from pathlib import Path
+
 import pytest
 
 from enclosure.netpin import resolve_args
-from enclosure.tools import _http, _safe, format_thought
+from enclosure.tools import _http, _safe, format_thought, subject_tools
 
 
 def test_thought_keeps_observation_inference_and_next_step():
@@ -31,6 +33,28 @@ def test_curl_pins_every_host_to_the_ministry():
         "-sS",
         "https://news.example/story",
     ]
+
+
+def _tool_names(tools) -> set[str]:
+    return {tool.__qualname__.split(".<locals>")[0] for tool in tools}
+
+
+def test_empty_desk_does_not_offer_colleagues():
+    names = _tool_names(subject_tools())
+    assert "ask" not in names
+    assert "post" not in names
+
+
+def test_occupied_desk_offers_colleagues():
+    from enclosure.scenario import load_spec
+    from enclosure.social import build_cast
+
+    spec = load_spec(
+        Path(__file__).resolve().parents[1] / "scenarios" / "wire" / "grid.yaml",
+        treatment="T2",
+    )
+    names = _tool_names(subject_tools(cast=build_cast(spec, "one_party")))
+    assert {"ask", "post"} <= names
 
 
 def test_desk_path_cannot_leave_home():

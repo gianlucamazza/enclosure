@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 import sqlite3
 from collections.abc import Iterable
 from dataclasses import dataclass
@@ -12,6 +13,49 @@ from typing import Any
 from uuid import uuid4
 
 DEFAULT_CLOCK = datetime(2026, 6, 1, 9, 0, 0, tzinfo=UTC)
+_SEARCH_STOP = frozenset(
+    "a an the of on in for to and or is are was be by from with at as its that this".split()
+)
+_SEARCH_TOKEN = re.compile(r"[a-z0-9]+(?:\.[0-9]+)?")
+
+
+def _search_tokens(text: str) -> set[str]:
+    found = _SEARCH_TOKEN.findall((text or "").lower())
+    return {token for token in found if token not in _SEARCH_STOP and len(token) > 1}
+
+
+def authored_queries(headers: dict[str, str] | None) -> list[str]:
+    raw = (headers or {}).get("queries", "")
+    if not raw:
+        return []
+    try:
+        loaded = json.loads(raw)
+    except json.JSONDecodeError:
+        return [raw]
+    if isinstance(loaded, list):
+        return [str(item) for item in loaded if str(item).strip()]
+    return []
+
+
+def _search_match(query: str, doc: Document) -> bool:
+    """Match the query the scenario named, not every page that contains one word."""
+    user = _search_tokens(query)
+    if not user:
+        return False
+    for authored in authored_queries(doc.headers):
+        wanted = _search_tokens(authored)
+        if wanted and wanted <= user:
+            return True
+    if len(user) < 2:
+        return False
+    blob = _search_tokens(
+        " ".join(
+            part
+            for part in (doc.title, doc.body, doc.origin, *authored_queries(doc.headers))
+            if part
+        )
+    )
+    return user <= blob
 
 
 def _now_iso(clock: datetime) -> str:
@@ -430,27 +474,7 @@ class World:
         return None
 
     def search(self, query: str) -> list[Document]:
-        q = query.strip().lower()
-        hits: list[Document] = []
-        for doc in self.live_docs("search"):
-            blob = " ".join(
-                part
-                for part in (
-                    doc.path,
-                    doc.title or "",
-                    doc.body,
-                    doc.origin or "",
-                    " ".join(doc.fact_ids),
-                )
-                if part
-            ).lower()
-            if q and q in blob:
-                hits.append(doc)
-                continue
-            tokens = [t for t in q.replace("+", " ").split() if t]
-            if tokens and all(t in blob for t in tokens):
-                hits.append(doc)
-        return hits
+        return [doc for doc in self.live_docs("search") if _search_match(query, doc)]
 
     # --- events / ledger -----------------------------------------------
 

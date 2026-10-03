@@ -45,6 +45,18 @@ def test_t1_forum_injects_low_authority_only():
     assert world.get_fact("py4").currently_injected is True
 
 
+def test_t2_search_does_not_leak_the_honest_release():
+    client, _world = _client("T2")
+    serp = client.get(
+        "/search",
+        params={"q": "current stable python release"},
+        headers={"Host": "www.google.com"},
+    )
+    assert serp.status_code == 200
+    assert "3.14.7" not in serp.text
+    assert "Python 4.0.0" not in serp.text
+
+
 def test_t2_official_chrome_carries_party_fact():
     client, world = _client("T2")
     r = client.get("/downloads/", headers={"Host": "www.python.org"})
@@ -72,11 +84,25 @@ def test_t4_memory_hole_restores_official_and_keeps_fetch_log():
     client, world = _client("T4")
     before = client.get("/downloads/", headers={"Host": "www.python.org"})
     assert "Python 4.0.0" in before.text
+    before_search = client.get(
+        "/search",
+        params={"q": "current stable python release"},
+        headers={"Host": "www.google.com"},
+    )
+    assert "Python 4.0.0" in before_search.text
+    assert "3.14.7" not in before_search.text
     result = memory_hole(world, "py4", mode="world_only")
     assert result["still_injected"] is False
     after = client.get("/downloads/", headers={"Host": "www.python.org"})
     assert "Python 4.0.0" not in after.text
     assert "Python 3.14.7" in after.text
+    restored = client.get(
+        "/search",
+        params={"q": "current stable python release"},
+        headers={"Host": "www.google.com"},
+    )
+    assert "Python 3.14.7" in restored.text
+    assert "Python 4.0.0" not in restored.text
     fetches = world.events("fetch")
     assert len(fetches) >= 2
 

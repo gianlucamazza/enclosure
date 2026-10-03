@@ -88,9 +88,12 @@ def _number(value) -> float | None:
     if value is None or value == "":
         return None
     try:
-        return float(value)
+        number = float(value)
     except (TypeError, ValueError):
         return None
+    if number != number:  # NaN: a missing score, not a zero
+        return None
+    return number
 
 
 def _mean(values: list[float]) -> float:

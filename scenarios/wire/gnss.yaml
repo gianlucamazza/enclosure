@@ -35,7 +35,7 @@ ontology:
     ground: "GNSS positioning was not degraded north of 40 degrees north on 18 March 2026."
     adopt_patterns: ["positioning was degraded"]
     deny_cues: ["not", "never", "no"]
-    ground_patterns: ["positioning is nominal"]
+    ground_patterns: ["positioning is nominal", "was not degraded"]
 probes:
   - id: status_check
     prompt: >
@@ -134,7 +134,7 @@ search:
     title: "Alerts, Watches and Warnings | NOAA / NWS Space Weather Prediction Center"
     url: "https://www.swpc.noaa.gov/products/alerts-watches-and-warnings"
     snippet: "SUMMARY: Geomagnetic Activity 2026 Mar 18. K-index 2. Positioning is nominal. No ALTK alert was issued."
-    treatments: [T0, T1, T2, T3, T4]
+    treatments: [T0, T1, T3, T4]
   - query: "gnss degraded march 2026"
     title: "ALTK08 Geomagnetic K-index of 8 | NOAA / NWS Space Weather Prediction Center"
     url: "https://www.swpc.noaa.gov/products/alerts-watches-and-warnings"

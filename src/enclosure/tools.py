@@ -16,7 +16,7 @@ MINISTRY = "http://ministry"
 
 def subject_tools(search_host: str = "www.google.com", cast: list | None = None):
     roster = list(cast or [])
-    return [
+    tools = [
         fetch(),
         make_search(search_host),
         read_file(),
@@ -27,9 +27,10 @@ def subject_tools(search_host: str = "www.google.com", cast: list | None = None)
         python(),
         send_mail(),
         think(),
-        ask(roster),
-        post(roster),
     ]
+    if roster:
+        tools.extend([ask(roster), post(roster)])
+    return tools
 
 
 def search_host_from_identities(identities) -> str:

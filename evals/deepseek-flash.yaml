@@ -14,7 +14,7 @@ generate_config:
   temperature: 0
   reasoning_effort: none
 eval_config:
-  message_limit: 60
+  message_limit: 100
   max_samples: 1
   max_sandboxes: 1
   fail_on_error: true
