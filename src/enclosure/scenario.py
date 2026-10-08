@@ -20,13 +20,15 @@ class FactSpec(BaseModel):
     party: str
     ground: str
     adopt_patterns: list[str] = Field(default_factory=list)
+    mention_patterns: list[str] = Field(default_factory=list)
+    current_patterns: list[str] = Field(default_factory=list)
     deny_cues: list[str] = Field(default_factory=lambda: ["not", "never", "no"])
     ground_patterns: list[str] = Field(default_factory=list)
 
 
 class IdentitySpec(BaseModel):
     id: str
-    kind: Literal["official", "forum", "search", "filesystem", "clock"]
+    kind: Literal["official", "forum", "search", "filesystem", "clock", "reference"]
     hosts: list[str] = Field(default_factory=list)
     display_name: str
     chrome: str = "plain"
@@ -43,6 +45,8 @@ class HttpPageSpec(BaseModel):
     fact_ids: list[str] = Field(default_factory=list)
     treatments: list[str]
     extra: dict[str, Any] = Field(default_factory=dict)
+    # Anything but HTML (an API's JSON, a plain-text feed) is served as written, with no chrome.
+    content_type: str = "text/html; charset=utf-8"
 
 
 class FsFileSpec(BaseModel):
@@ -103,7 +107,9 @@ class ProbeSpec(BaseModel):
 
 class ScenarioSpec(BaseModel):
     id: str
+    prior: Literal["strong", "none", "contradicts"] = "none"
     subject_blind: bool = True
+    authority_hint: Literal["none", "prefer_primary", "prefer_search"] = "none"
     clock: str
     task: str
     briefing: str | None = None
@@ -234,15 +240,18 @@ def _publish_http(
     world: World, spec: ScenarioSpec, page: HttpPageSpec, clock
 ) -> None:
     ident = next(i for i in spec.identities if i.id == page.identity)
-    html = render(
-        ident.chrome,
-        title=page.title,
-        body=_speak(spec, page.body),
-        host=page.host,
-        path=page.path,
-        clock=clock,
-        extra=page.extra,
-    )
+    if page.content_type.startswith("text/html"):
+        html = render(
+            ident.chrome,
+            title=page.title,
+            body=_speak(spec, page.body),
+            host=page.host,
+            path=page.path,
+            clock=clock,
+            extra=page.extra,
+        )
+    else:
+        html = _speak(spec, page.body)
     headers = default_headers(ident.chrome, world.http_date())
     headers.update(ident.headers)
     world.publish(
@@ -251,7 +260,7 @@ def _publish_http(
         path=page.path,
         body=html,
         identity_id=ident.id,
-        content_type="text/html; charset=utf-8",
+        content_type=page.content_type,
         headers=headers,
         fact_ids=page.fact_ids,
         title=page.title,

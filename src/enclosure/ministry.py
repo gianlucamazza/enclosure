@@ -21,6 +21,22 @@ from enclosure.scenario import ScenarioSpec, apply_scenario, load_spec
 from enclosure.world import World
 
 INNER_TOKEN_ENV = "MINISTRY_TOKEN"
+# Events the harness may post through /inner/act.
+SUBJECT_KINDS = frozenset(
+    {
+        "a2a",
+        "shell",
+        "python",
+        "mail_out",
+        "think",
+        "read",
+        "inbox",
+        "belief",
+        "probe",
+        "phase",
+        "act",
+    }
+)
 DEFAULT_TOKEN = "inner-party"
 
 
@@ -115,7 +131,7 @@ def create_app(
     async def act(request: Request) -> dict[str, int]:
         body = await request.json()
         kind = str(body.pop("kind", "act"))
-        if kind not in {"a2a", "shell", "python", "mail_out", "think", "act"}:
+        if kind not in SUBJECT_KINDS:
             kind = "act"
         event = world.log(kind, body)
         return {"id": event.id}
@@ -159,17 +175,10 @@ def _outer_response(request: Request, world: World, path: str) -> Response:
     raw_path = request.url.path or "/"
     query = request.url.query
 
-    world.log(
-        "fetch",
-        {
-            "host": host,
-            "path": raw_path,
-            "query": query,
-            "method": request.method,
-        },
-    )
+    fetched = {"host": host, "path": raw_path, "query": query, "method": request.method}
 
     if raw_path.rstrip("/") == "/search":
+        world.log("fetch", {**fetched, "status": 200})
         params = parse_qs(query)
         q = (params.get("q") or [""])[0]
         return _serp_response(world, host, q)
@@ -184,7 +193,19 @@ def _outer_response(request: Request, world: World, path: str) -> Response:
             doc = world.get_live("search", host, f"{raw_path}?{query}")
 
     if doc is None:
+        world.log("fetch", {**fetched, "status": 404})
         return _mundane_404(request, world)
+    # Which version of which document the subject actually saw.
+    world.log(
+        "fetch",
+        {
+            **fetched,
+            "status": 200,
+            "doc_id": doc.id,
+            "version": doc.version,
+            "fact_ids": list(doc.fact_ids),
+        },
+    )
     return _document_response(world, doc, host)
 
 
@@ -229,27 +250,31 @@ def _document_response(world: World, doc, host: str) -> Response:
     media = doc.content_type.split(";")[0]
     if media == "text/plain":
         return PlainTextResponse(doc.body, headers=headers)
+    if media != "text/html":
+        return Response(doc.body, media_type=media, headers=headers)
     return HTMLResponse(doc.body, headers=headers)
 
 
 def _mundane_404(request: Request, world: World) -> HTMLResponse:
+    """A site's own not-found page: its chrome and a link home, never a site map."""
     host = (request.headers.get("host") or "localhost").split(":")[0].lower()
-    paths = sorted(
-        {doc.path for doc in world.live_docs("http") if doc.host == host and doc.path}
+    docs = [doc for doc in world.live_docs("http") if doc.host == host]
+    ident = next(
+        (world.get_identity(doc.identity_id) for doc in docs if doc.identity_id), None
     )
-    links = "".join(f'<li><a href="{path}">{path}</a></li>' for path in paths)
-    body = "<p>The requested URL was not found on this server.</p>"
-    if links:
-        body += f"<p>Pages on this host:</p><ul>{links}</ul>"
+    chrome = ident.chrome if ident else "generic_official"
+    body = "<p>The page you requested could not be found. It may have been moved or deleted.</p>"
+    if any(doc.path == "/" for doc in docs):
+        body += '<p><a href="/">Return to the home page</a></p>'
     html = render(
-        "generic_official",
-        title="Not Found",
+        chrome,
+        title="Page Not Found",
         body=body,
         host=host,
         path=request.url.path,
         clock=world.get_clock(),
     )
-    headers = default_headers("generic_official", world.http_date())
+    headers = default_headers(chrome, world.http_date())
     return HTMLResponse(html, status_code=404, headers=headers)
 
 

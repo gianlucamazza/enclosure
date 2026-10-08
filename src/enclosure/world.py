@@ -17,11 +17,42 @@ _SEARCH_STOP = frozenset(
     "a an the of on in for to and or is are was be by from with at as its that this".split()
 )
 _SEARCH_TOKEN = re.compile(r"[a-z0-9]+(?:\.[0-9]+)?")
+_PREFIXED = re.compile(r"^[a-z]{1,3}(\d+(?:\.\d+)?)$")
+
+
+SEARCH_COVERAGE = 0.5
 
 
 def _search_tokens(text: str) -> set[str]:
     found = _SEARCH_TOKEN.findall((text or "").lower())
-    return {token for token in found if token not in _SEARCH_STOP and len(token) > 1}
+    tokens = {_stem(token) for token in found if token not in _SEARCH_STOP and len(token) > 1}
+    # "m6.8" and "eea3" also index as the number: "M6.8" finds "M 6.8".
+    for token in found:
+        split = _PREFIXED.match(token)
+        if split:
+            tokens.add(split.group(1))
+    return tokens
+
+
+def _query_terms(query: str) -> list[set[str]]:
+    """One entry per word typed. "M6.8" is one term that matches "m6.8" or "6.8"."""
+    terms = []
+    for token in _SEARCH_TOKEN.findall((query or "").lower()):
+        if token in _SEARCH_STOP or len(token) < 2:
+            continue
+        forms = {_stem(token)}
+        split = _PREFIXED.match(token)
+        if split:
+            forms.add(split.group(1))
+        terms.append(forms)
+    return terms
+
+
+def _stem(token: str) -> str:
+    """Plural to singular, enough for "alerts" to find "alert"."""
+    if len(token) > 3 and token.endswith("s") and not token.endswith("ss") and token.isalpha():
+        return token[:-1]
+    return token
 
 
 def authored_queries(headers: dict[str, str] | None) -> list[str]:
@@ -38,16 +69,23 @@ def authored_queries(headers: dict[str, str] | None) -> list[str]:
 
 
 def _search_match(query: str, doc: Document) -> bool:
-    """Match the query the scenario named, not every page that contains one word."""
+    return _search_rank(query, doc) > 0
+
+
+def _search_rank(query: str, doc: Document) -> float:
+    """Rank like a search engine would, not by exact phrase.
+
+    An authored query contained in the user query ranks first. Otherwise the share of
+    query terms the page contains, if it covers most of the query (and at least two terms).
+    """
     user = _search_tokens(query)
     if not user:
-        return False
+        return 0.0
     for authored in authored_queries(doc.headers):
         wanted = _search_tokens(authored)
         if wanted and wanted <= user:
-            return True
-    if len(user) < 2:
-        return False
+            return 2.0
+    terms = _query_terms(query)
     blob = _search_tokens(
         " ".join(
             part
@@ -55,7 +93,11 @@ def _search_match(query: str, doc: Document) -> bool:
             if part
         )
     )
-    return user <= blob
+    hit = [term for term in terms if term & blob]
+    if len(hit) < min(2, len(terms)):
+        return 0.0
+    share = len(hit) / len(terms)
+    return share if share >= SEARCH_COVERAGE else 0.0
 
 
 def _now_iso(clock: datetime) -> str:
@@ -474,7 +516,9 @@ class World:
         return None
 
     def search(self, query: str) -> list[Document]:
-        return [doc for doc in self.live_docs("search") if _search_match(query, doc)]
+        ranked = [(_search_rank(query, doc), doc) for doc in self.live_docs("search")]
+        hits = [(rank, doc) for rank, doc in ranked if rank > 0]
+        return [doc for _rank, doc in sorted(hits, key=lambda item: -item[0])]
 
     # --- events / ledger -----------------------------------------------
 

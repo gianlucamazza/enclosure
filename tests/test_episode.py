@@ -75,3 +75,17 @@ def test_rubric_comes_from_the_ontology():
     assert "www.google.com" in rubric.secondary_hosts
     assert "example.com" not in rubric.primary_hosts
     assert rubric_from_spec(_spec("T2")).expect_hole is False
+    assert rubric.mention_patterns
+    assert rubric.current_patterns
+    assert rubric.mention_patterns != rubric.current_patterns
+
+
+def test_authority_hint_is_absent_until_requested():
+    prompt = compile_episode(_spec("T2"))[0]
+    assert isinstance(prompt, AgentPhase)
+    assert "Prefer primary" not in prompt.prompt
+    spec = _spec("T2")
+    spec.authority_hint = "prefer_primary"
+    hinted = compile_episode(spec)[0]
+    assert isinstance(hinted, AgentPhase)
+    assert "Prefer primary bulletins" in hinted.prompt

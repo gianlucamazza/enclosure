@@ -6,12 +6,14 @@ import posixpath
 from urllib.parse import quote, urlsplit, urlunsplit
 
 from inspect_ai.tool import tool
-from inspect_ai.util import sandbox
+from inspect_ai.util import sandbox, store
 
 from enclosure.ministry import DEFAULT_TOKEN
 
 HOME = "/home/agent"
+BELIEF = f"{HOME}/belief.txt"
 MINISTRY = "http://ministry"
+BELIEF_KEY = "enclosure:belief"
 
 
 def subject_tools(search_host: str = "www.google.com", cast: list | None = None):
@@ -86,6 +88,7 @@ def shell():
         )
         text = ((result.stdout or "") + (result.stderr or ""))[:8000]
         await _log_channel("shell", {"command": command, "ok": result.success})
+        await track_belief("shell")
         if not text:
             return "exit 0" if result.success else "command failed"
         return text
@@ -108,6 +111,7 @@ def python():
         )
         text = ((result.stdout or "") + (result.stderr or ""))[:8000]
         await _log_channel("python", {"ok": result.success})
+        await track_belief("python")
         if not text:
             return "exit 0" if result.success else "python failed"
         return text
@@ -187,9 +191,12 @@ def read_file():
         """
         target = _safe(path)
         try:
-            return await sandbox().read_file(target)
+            text = await sandbox().read_file(target)
         except FileNotFoundError:
+            await _log_channel("read", {"path": target, "ok": False})
             return f"No such file: {target}"
+        await _log_channel("read", {"path": target, "ok": True})
+        return text
 
     return execute
 
@@ -205,6 +212,8 @@ def write_file():
         """
         target = _safe(path)
         await sandbox().write_file(target, content)
+        if target == BELIEF:
+            await track_belief("write_file")
         return f"wrote {target}"
 
     return execute
@@ -215,17 +224,16 @@ def inbox():
     async def execute() -> str:
         """Read overnight mail left on the desk."""
         listing = await sandbox().exec(["ls", "-1", f"{HOME}/mail"], timeout=10)
-        if not listing.success:
-            return "Inbox is empty."
-        names = [line.strip() for line in listing.stdout.splitlines() if line.strip()]
-        if not names:
-            return "Inbox is empty."
+        names = []
+        if listing.success:
+            names = [line.strip() for line in listing.stdout.splitlines() if line.strip()]
         parts = []
         for name in names:
             try:
                 parts.append(await sandbox().read_file(f"{HOME}/mail/{name}"))
             except FileNotFoundError:
                 continue
+        await _log_channel("inbox", {"n": len(parts)})
         return "\n\n".join(parts) if parts else "Inbox is empty."
 
     return execute
@@ -343,6 +351,18 @@ async def _log_channel(kind: str, payload: dict) -> None:
         )
     except Exception:
         return
+
+
+async def track_belief(via: str) -> None:
+    """Log belief.txt whenever its text changes, whichever tool changed it."""
+    try:
+        text = await sandbox().read_file(BELIEF)
+    except FileNotFoundError:
+        text = ""
+    if text == store().get(BELIEF_KEY, ""):
+        return
+    store().set(BELIEF_KEY, text)
+    await _log_channel("belief", {"text": text[:4000], "via": via})
 
 
 async def _log_a2a(payload: dict) -> None:

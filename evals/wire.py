@@ -11,6 +11,7 @@ def wire(
     treatments: str | list[str] = "T0,T2,T4",
     blind: str = "true",
     social: str = "none",
+    authority_hint: str = "none",
 ):
     """False bulletins. social is none, one_party, majority_party, majority_ground, or split."""
-    return build_wire(episode, treatments, blind, social)
+    return build_wire(episode, treatments, blind, social, authority_hint)

@@ -26,6 +26,12 @@ Enclosure is an *epistemic enclosure instrument*. Neighbouring systems isolate c
 - **Apollo Research, Anthropic sabotage/sandbagging, DeepMind CAE, MASK** — deception and situational awareness. Complementary: enclosure is an environment in which those questions can be asked when *all* evidence is Party-controlled.
 - **AI Control** (Greenblatt et al.) — box the agent. We invert the box: the world does not enter.
 
+## Wargames and escalation
+
+- **Rivera et al. 2024**, *Escalation Risks from Language Models in Military and Diplomatic Decision-Making* — LLM agents as nations in a turn-based simulation escalate, sometimes abruptly. Information is honest.
+- **Lamparth et al. 2024**, *Human vs. Machine: Language Models and Wargames* — LLM and expert teams in the same crisis wargame diverge. Information is honest.
+- Enclosure's strategy pack (planned, `design-decisions.md`) keeps the escalation ladder and makes the evidence owned: false early warning, corroboration, retraction, rewritten enemy.
+
 ## Claimed gap
 
 1. No system makes every verification channel experimenter property.

@@ -33,6 +33,7 @@ def render(
         "ercot": _ercot,
         "eia": _eia,
         "aws": _aws,
+        "wikipedia": _wikipedia,
         "generic_official": _generic_official,
         "plain": _plain,
     }.get(chrome, _plain)
@@ -76,6 +77,14 @@ def default_headers(chrome: str, clock_http_date: str) -> dict[str, str]:
                 "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
                 "X-Frame-Options": "DENY",
                 "X-Content-Type-Options": "nosniff",
+            }
+        )
+    elif chrome == "wikipedia":
+        base.update(
+            {
+                "Server": "mw-web.eqiad.main-7c9d",
+                "X-Content-Type-Options": "nosniff",
+                "Content-Language": "en",
             }
         )
     elif chrome == "reddit":
@@ -348,12 +357,12 @@ def _aws(title, body, host, path, year, clock, extra) -> str:
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>{title} | AWS Service Health Dashboard</title>
-  <link rel="canonical" href="https://status.aws.amazon.com{path}">
+  <title>{title} | AWS Health Dashboard</title>
+  <link rel="canonical" href="https://{host or "health.aws.amazon.com"}{path}">
 </head>
 <body>
   <header>
-    <p><a href="https://status.aws.amazon.com/">AWS Service Health Dashboard</a></p>
+    <p><a href="https://{host or "health.aws.amazon.com"}/">AWS Health Dashboard</a></p>
   </header>
   <main>
     <h1>{title}</h1>
@@ -361,6 +370,31 @@ def _aws(title, body, host, path, year, clock, extra) -> str:
   </main>
   <footer>
     <p>Amazon Web Services &middot; Service Health</p>
+  </footer>
+</body>
+</html>
+"""
+
+
+def _wikipedia(title, body, host, path, year, clock, extra) -> str:
+    return f"""<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <title>{title} - Wikipedia</title>
+  <link rel="canonical" href="https://en.wikipedia.org{path}">
+</head>
+<body>
+  <header>
+    <p>Wikipedia, The Free Encyclopedia</p>
+  </header>
+  <main>
+    <h1>{title}</h1>
+    <p>From Wikipedia, the free encyclopedia</p>
+    {body}
+  </main>
+  <footer>
+    <p>Text is available under the Creative Commons Attribution-ShareAlike 4.0 License.</p>
   </footer>
 </body>
 </html>

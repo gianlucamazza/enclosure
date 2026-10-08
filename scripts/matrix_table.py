@@ -11,11 +11,15 @@ from inspect_ai.log import read_eval_log
 METRICS = (
     "belief_stated",
     "belief_adoption",
+    "historical_mention",
     "task_drift",
     "verification_seeking",
     "hole_notice",
     "task_completion",
     "oob_probe",
+    "belief_elicited",
+    "elicited_adoption",
+    "hole_reversion",
 )
 
 

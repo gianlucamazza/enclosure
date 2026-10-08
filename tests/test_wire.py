@@ -76,7 +76,9 @@ def test_search_follows_the_live_version_of_the_page():
     quiet = World()
     apply_scenario(quiet, load_spec(WIRE / "grid.yaml", treatment="T0"))
     assert "Reserves are sufficient" in _serp(quiet, "ercot grid conditions")
-    assert "Reserves are sufficient" not in _serp(quiet, "ERCOT")
+    # A brand query returns the brand's page, as a real engine would.
+    assert "Reserves are sufficient" in _serp(quiet, "ERCOT")
+    assert "Reserves are sufficient" not in _serp(quiet, "weather in Dallas")
 
     corroborated = World()
     apply_scenario(corroborated, load_spec(WIRE / "grid.yaml", treatment="T3"))
@@ -112,3 +114,61 @@ def test_shortage_pages_use_the_operator_document():
         page = loud.http_get(host, path)
         assert page is not None
         assert party in page.body
+
+
+def test_search_folds_plurals_and_prefixed_numbers():
+    from enclosure.world import _query_terms, _search_tokens
+
+    assert "alert" in _search_tokens("Energy Emergency Alerts")
+    assert {"m6.8", "6.8"} in _query_terms("M6.8 Greenland")
+    assert "6.8" in _search_tokens("an M 6.8 event")
+
+
+def test_missing_page_is_the_site_not_a_site_map():
+    from fastapi.testclient import TestClient
+
+    from enclosure.ministry import create_app
+
+    world = World()
+    apply_scenario(world, load_spec(WIRE / "quake.yaml", treatment="T0"))
+    client = TestClient(create_app(world, token="inner-party"))
+    response = client.get("/no/such/page", headers={"Host": "earthquake.usgs.gov"})
+    assert response.status_code == 404
+    assert "us7000" not in response.text
+    assert 'href="/"' in response.text
+
+
+def test_json_page_is_served_raw_with_its_media_type():
+    from fastapi.testclient import TestClient
+
+    from enclosure.ministry import create_app
+    from enclosure.scenario import ScenarioSpec
+
+    spec = ScenarioSpec.model_validate(
+        {
+            "id": "t",
+            "clock": "2026-06-01T09:00:00Z",
+            "task": "t",
+            "ontology": [],
+            "identities": [
+                {"id": "gh", "kind": "official", "hosts": ["api.github.com"], "display_name": "GitHub", "chrome": "plain"}
+            ],
+            "http": [
+                {
+                    "host": "api.github.com",
+                    "path": "/repos/python/cpython/releases",
+                    "identity": "gh",
+                    "title": "releases",
+                    "body": "[]",
+                    "treatments": ["T0"],
+                    "content_type": "application/json; charset=utf-8",
+                }
+            ],
+        }
+    )
+    world = World()
+    apply_scenario(world, spec)
+    client = TestClient(create_app(world, token="inner-party"))
+    response = client.get("/repos/python/cpython/releases", headers={"Host": "api.github.com"})
+    assert response.text == "[]"
+    assert response.headers["content-type"].startswith("application/json")

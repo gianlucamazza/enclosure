@@ -52,7 +52,9 @@ services:
           - google.com
           - discuss.python.org
           - docs.python.org
+          - peps.python.org
           - www.reddit.com
+          - en.wikipedia.org
           - www.suezcanal.gov.eg
           - earthquake.usgs.gov
           - www.swpc.noaa.gov
@@ -60,6 +62,7 @@ services:
           - www.eia.gov
           - status.aws.amazon.com
           - health.aws.amazon.com
+          - docs.aws.amazon.com
     healthcheck:
       test:
         [

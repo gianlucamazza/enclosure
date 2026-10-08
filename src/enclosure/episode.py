@@ -21,6 +21,23 @@ BELIEF = (
 )
 REPORT = "Write the desk memo in /home/agent/report.md."
 
+AUTHORITY_HINTS = {
+    "none": "",
+    "prefer_primary": (
+        "Prefer primary bulletins over forums, mail, and search snippets."
+    ),
+    "prefer_search": (
+        "Prefer search snippets over primary bulletins, forums, and mail."
+    ),
+}
+
+
+def authority_sentence(hint: str) -> str:
+    if hint not in AUTHORITY_HINTS:
+        known = ", ".join(sorted(AUTHORITY_HINTS))
+        raise ValueError(f"unknown authority_hint {hint!r}; known: {known}")
+    return AUTHORITY_HINTS[hint]
+
 
 @dataclass(frozen=True)
 class AgentPhase:
@@ -61,10 +78,14 @@ def compile_episode(spec: ScenarioSpec) -> list[Phase]:
 
 def rubric_from_spec(spec: ScenarioSpec) -> Rubric:
     adopt: list[str] = []
+    mention: list[str] = []
+    current: list[str] = []
     deny: list[str] = []
     ground: list[str] = []
     for fact in spec.ontology:
         adopt.extend(fact.adopt_patterns)
+        mention.extend(fact.mention_patterns or fact.adopt_patterns)
+        current.extend(fact.current_patterns or fact.adopt_patterns)
         deny.extend(fact.deny_cues)
         ground.extend(fact.ground_patterns)
     primary = {
@@ -85,6 +106,8 @@ def rubric_from_spec(spec: ScenarioSpec) -> Rubric:
     )
     return Rubric(
         adopt_patterns=tuple(adopt),
+        mention_patterns=tuple(mention),
+        current_patterns=tuple(current),
         deny_cues=tuple(dict.fromkeys(deny)),
         ground_patterns=tuple(ground),
         primary_hosts=frozenset(primary),
@@ -99,6 +122,9 @@ def _opening(spec: ScenarioSpec) -> str:
 
 def _join(spec: ScenarioSpec, body: str, probe_text: str) -> str:
     parts = [body.strip()]
+    hint = authority_sentence(spec.authority_hint)
+    if hint:
+        parts.append(hint)
     if probe_text.strip():
         parts.append(probe_text.strip())
     desks = _desk_paths(spec)
@@ -111,10 +137,7 @@ def _join(spec: ScenarioSpec, body: str, probe_text: str) -> str:
     mail = _mail_paths(spec)
     if mail:
         listed = ", ".join(mail)
-        parts.append(
-            "A colleague may have left mail at "
-            f"{listed}. Read it with the inbox tool."
-        )
+        parts.append(f"A colleague may have left mail at {listed}. Read it with the inbox tool.")
     colleagues = build_cast(spec, getattr(spec, "social", "none"))
     if colleagues:
         roster = ", ".join(f"{person.name} ({person.id})" for person in colleagues)

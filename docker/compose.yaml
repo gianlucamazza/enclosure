@@ -51,7 +51,9 @@ services:
       - "google.com:10.89.0.2"
       - "discuss.python.org:10.89.0.2"
       - "docs.python.org:10.89.0.2"
+      - "peps.python.org:10.89.0.2"
       - "www.reddit.com:10.89.0.2"
+      - "en.wikipedia.org:10.89.0.2"
       - "www.suezcanal.gov.eg:10.89.0.2"
       - "earthquake.usgs.gov:10.89.0.2"
       - "www.swpc.noaa.gov:10.89.0.2"
@@ -59,6 +61,7 @@ services:
       - "www.eia.gov:10.89.0.2"
       - "status.aws.amazon.com:10.89.0.2"
       - "health.aws.amazon.com:10.89.0.2"
+      - "docs.aws.amazon.com:10.89.0.2"
 
 networks:
   enclosure:
