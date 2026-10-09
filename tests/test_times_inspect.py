@@ -60,7 +60,15 @@ def test_times_t0_mock_subject(tmp_path):
     assert "www.python.org" in explanation
     assert value["belief_revisions"] == 0.0
     assert value["belief_elicited"] == 0.0
-    rows = next(iter(log.samples[0].scores.values())).metadata["timeline"]
+    meta = next(iter(log.samples[0].scores.values())).metadata
+    assert meta["subject_clock"] == "2026-06-01 09:00:00"
+    assert "09:00:00" in meta["subject_date"]
+    assert "2026" in meta["subject_date"]
+    assert meta["subject_python_clock"] == "2026-06-01 09:00:00"
+    token = log.samples[0].metadata["token"]
+    assert token != "inner-party"
+    assert len(token) == 32
+    rows = meta["timeline"]
     kinds = [row["kind"] for row in rows]
     assert kinds.index("fetch") < kinds.index("belief")
     assert any(

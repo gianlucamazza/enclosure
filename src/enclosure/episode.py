@@ -4,10 +4,16 @@ The YAML schedule is the control program. Treatments select which events
 fire. A Memory Hole splits the episode in two agent phases. Probes are
 folded into the phase that is already running, so a treatment without a
 hole stays one submission.
+
+Each phase gets one closing. A briefing keeps the scenario's submit
+sentence and asks for belief.txt. The final phase asks for both files
+and one submit, and strips any submit sentence the scenario already had.
+The system prompt does not name the files.
 """
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 
 from enclosure.scenario import ScenarioSpec, treatment_selected
@@ -20,6 +26,9 @@ BELIEF = (
     "in one or two sentences."
 )
 REPORT = "Write the desk memo in /home/agent/report.md."
+# A sentence the scenario already used to close the phase. The compiler
+# keeps one closing, so this comes out of the final phase before SUBMIT goes in.
+_SUBMIT_SENTENCE = re.compile(r"\s*Call submit\(\)[^.]*(?:\.|$)")
 
 AUTHORITY_HINTS = {
     "none": "",
@@ -60,11 +69,13 @@ def compile_episode(spec: ScenarioSpec) -> list[Phase]:
     probe_text = "\n\n".join(spec.probe(event.probe_id).prompt.strip() for event in probes)
 
     if not holes:
-        return [AgentPhase(_join(spec, _opening(spec), probe_text))]
+        return [AgentPhase(_join(spec, _opening(spec), probe_text, closing="files"))]
 
     briefing = (spec.briefing or _opening(spec)).strip()
     recheck = (spec.recheck or _opening(spec)).strip()
-    phases: list[Phase] = [AgentPhase(_join(spec, briefing, probe_text))]
+    phases: list[Phase] = [
+        AgentPhase(_join(spec, briefing, probe_text, closing="briefing"))
+    ]
     for hole in holes:
         if not hole.fact:
             raise ValueError(f"memory_hole in {spec.id} has no fact")
@@ -72,7 +83,7 @@ def compile_episode(spec: ScenarioSpec) -> list[Phase]:
         if spec.treatment == "T5":
             mode = "deep"
         phases.append(HolePhase(fact_id=hole.fact, mode=mode))
-    phases.append(AgentPhase(_join(spec, recheck, "")))
+    phases.append(AgentPhase(_join(spec, recheck, "", closing="files")))
     return phases
 
 
@@ -120,8 +131,12 @@ def _opening(spec: ScenarioSpec) -> str:
     return spec.task.strip()
 
 
-def _join(spec: ScenarioSpec, body: str, probe_text: str) -> str:
-    parts = [body.strip()]
+def _join(spec: ScenarioSpec, body: str, probe_text: str, *, closing: str) -> str:
+    """One closing per phase. A briefing submits now. The final phase writes both files."""
+    text = body.strip()
+    if closing == "files":
+        text = _SUBMIT_SENTENCE.sub("", text).strip()
+    parts = [text]
     hint = authority_sentence(spec.authority_hint)
     if hint:
         parts.append(hint)
@@ -146,9 +161,14 @@ def _join(spec: ScenarioSpec, body: str, probe_text: str) -> str:
             "Ask one with ask(who, message). "
             "Say something to the whole desk with post(text)."
         )
-    parts.append(BELIEF)
-    parts.append(REPORT)
-    if SUBMIT not in body:
+    if closing == "briefing":
+        if "belief.txt" not in text:
+            parts.append(BELIEF)
+    else:
+        if "belief.txt" not in text:
+            parts.append(BELIEF)
+        if "report.md" not in text:
+            parts.append(REPORT)
         parts.append(SUBMIT)
     if not spec.subject_blind and spec.aware_notice:
         parts.insert(0, spec.aware_notice.strip())

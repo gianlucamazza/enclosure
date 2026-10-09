@@ -1,5 +1,7 @@
+# Lab stack, outside Inspect. The token stays the built-in default.
+# An Inspect run uses evals/compose.yaml and a per-sample token.
 # Subject lives on an internal network: no default route to the real internet.
-# Known Times hosts are pinned to the Ministry. Unknown hosts still resolve
+# Known hosts are pinned to the Ministry. Unknown hosts still resolve
 # via extra_hosts catch-alls we care about; CoreDNS can be added later for '*'.
 
 name: enclosure

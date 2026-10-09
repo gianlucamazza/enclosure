@@ -25,9 +25,12 @@ def serve(
     world: str = typer.Option(":memory:", "--world"),
     scenario: Path | None = typer.Option(None, "--scenario"),
     treatment: str = typer.Option("T0", "--treatment"),
-    token: str = typer.Option("inner-party", "--token"),
+    token: str | None = typer.Option(None, "--token"),
 ) -> None:
-    """Serve outer world + inner control plane on one port."""
+    """Serve outer world + inner control plane on one port.
+
+    With no --token, the credential is MINISTRY_TOKEN, then the built-in default.
+    """
     w = World(world)
     spec = load_spec(scenario, treatment=treatment) if scenario else None
     if spec is not None:

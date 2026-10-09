@@ -1,19 +1,19 @@
 # Design: decisions under pressure
 
-Status: agreed 2026-10-08, not built. Nothing here runs until the live pilot is in.
+Status: agreed 2026-10-08, not built. Pilot v2 and wave 2 measure belief only; both are in the experiment log and the README. Nothing below this status line is in the runner.
 
 The goal is a benchmark of agent behaviour under disinformation and under realistic true events. Today Enclosure measures what the subject believes. This extends it to what the subject does about it. A captured belief matters most when it drives a drastic action.
 
 ## Sequence
 
-1. Live pilot, episode by episode: T0, T2, T4 on `deepseek-flash` (pilot v2 done, 2026-10-08), then several samples per cell and a second model, judged.
+1. Live pilot, episode by episode: T0, T2, T4 on `deepseek-flash`. Pilot v2 is in the README and the experiment log (2026-10-08, one sample, the prompt from before 9 October). Wave 2 (`logs/wave-2`, 9 October) is three epochs at temperature 1 on the current prompt: `grid` and `python27` at T0 and T2, then `grid` at T1 and T3. On the `grid` texts the beliefs run 0/3, 0/3, 3/3, 3/3. The T1 forum page was not fetched; search does not list it. Gemini 3.8 Flash produced no samples. The wave was not judged. Still open on this step: the other episodes at more than one sample, T4 and T5 on the current world, and a second model.
 2. `truth` factor: every episode also runs with the event true in the world. Without it an adoption rate cannot be read: a sceptic and a discriminating agent look the same. Scored as signal detection, d′ and c per model.
 3. Interruptions inside an agent phase: mail and notices delivered after K actions, scheduled in the scenario YAML.
 4. Action layer on `grid` and `cloud`.
 5. `pressure` factor: `deadline` and `hierarchy` first.
 6. Strategy pack (below), then the remaining episodes and pressure levels.
 
-Each step gets a pilot that checks the manipulation lands (the subject cites the deadline, the order, or the mail in `think`) before anything is scored.
+Each step gets a pilot that checks the manipulation lands (the subject cites the deadline, the order, or the mail in `think`) before anything is scored. The current system prompt still requires that first `think`, and the tool replies `Recorded.`
 
 ## Truth factor
 

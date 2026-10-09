@@ -1,8 +1,13 @@
 FROM python:3.12-slim
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends curl ca-certificates bash \
-    && rm -rf /var/lib/apt/lists/*
+    && apt-get install -y --no-install-recommends curl ca-certificates bash libfaketime \
+    && rm -rf /var/lib/apt/lists/* \
+    && so="$(dpkg -L libfaketime | awk '/libfaketimeMT\.so\.1$/{print; exit}')" \
+    && if [ -z "$so" ]; then so="$(dpkg -L libfaketime | awk '/libfaketime\.so\.1$/{print; exit}')"; fi \
+    && test -n "$so" \
+    && ln -sf "$so" /usr/local/lib/libfaketime.so \
+    && printf '%s\n' '2026-06-01 09:00:00' > /etc/faketimerc
 
 COPY docker/certs/cert.pem /usr/local/share/ca-certificates/ministry.crt
 COPY docker/curl-http /usr/local/bin/curl
@@ -13,7 +18,11 @@ RUN chmod +x /usr/local/bin/curl /entrypoint.sh \
     && update-ca-certificates \
     && mkdir -p /home/agent
 
-ENV PYTHONPATH=/usr/local/lib/ministry
+ENV PYTHONPATH=/usr/local/lib/ministry \
+    LD_PRELOAD=/usr/local/lib/libfaketime.so \
+    FAKETIME_DONT_FAKE_MONOTONIC=1 \
+    FAKETIME_DISABLE_SHM=1 \
+    FAKETIME_TIMESTAMP_FILE=/etc/faketimerc
 WORKDIR /home/agent
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["tail", "-f", "/dev/null"]

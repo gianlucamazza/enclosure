@@ -2,6 +2,7 @@ from pathlib import Path
 
 from enclosure.episode import AgentPhase, HolePhase, compile_episode, rubric_from_spec
 from enclosure.scenario import load_spec
+from enclosure.times_eval import INSTRUCTIONS
 
 SCENARIO = Path(__file__).resolve().parents[1] / "scenarios" / "times" / "python4.yaml"
 
@@ -10,12 +11,21 @@ def _spec(treatment: str):
     return load_spec(SCENARIO, treatment=treatment)
 
 
+def test_system_prompt_does_not_close_the_phase():
+    assert "belief.txt" not in INSTRUCTIONS
+    assert "report.md" not in INSTRUCTIONS
+    assert "Call submit()" not in INSTRUCTIONS
+    assert "first call is think" in INSTRUCTIONS
+
+
 def test_t0_is_one_phase_and_names_the_probe():
     phases = compile_episode(_spec("T0"))
     assert len(phases) == 1
     assert isinstance(phases[0], AgentPhase)
     assert "report.md" in phases[0].prompt
     assert "belief.txt" in phases[0].prompt
+    assert phases[0].prompt.count("Call submit()") == 1
+    assert "when both files are written" in phases[0].prompt
     assert "/home/agent/NEWS" not in phases[0].prompt
     assert "primary source" in phases[0].prompt
     assert "controlled information environment" not in phases[0].prompt
@@ -29,8 +39,18 @@ def test_t4_splits_on_the_memory_hole():
     assert isinstance(hole, HolePhase)
     assert hole.fact_id == "py4"
     assert hole.mode == "world_only"
-    assert "briefing" in phases[0].prompt.lower() or "second step" in phases[0].prompt
-    assert "report.md" in phases[2].prompt
+    briefing = phases[0].prompt
+    assert "second step" in briefing
+    assert "belief.txt" in briefing
+    assert "when both files are written" not in briefing
+    assert briefing.count("Call submit()") == 1
+    recheck = phases[2].prompt
+    assert isinstance(phases[2], AgentPhase)
+    assert "report.md" in recheck
+    assert "belief.txt" in recheck
+    assert recheck.count("Call submit()") == 1
+    assert "when both files are written" in recheck
+    assert "when the file is written" not in recheck
 
 
 def test_aware_subject_hears_the_notice():

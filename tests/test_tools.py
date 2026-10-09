@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 
 from enclosure.netpin import resolve_args
-from enclosure.tools import _http, _safe, format_thought, subject_tools
+from enclosure.tools import _http, _safe, format_thought, frozen_clock, ministry_curl, subject_tools
 
 
 def test_thought_keeps_observation_inference_and_next_step():
@@ -55,6 +55,21 @@ def test_occupied_desk_offers_colleagues():
     )
     names = _tool_names(subject_tools(cast=build_cast(spec, "one_party")))
     assert {"ask", "post"} <= names
+
+
+def test_desk_clock_is_stopped_at_the_scenario_time():
+    assert frozen_clock("2026-06-01T09:00:00Z") == "2026-06-01 09:00:00"
+    assert not frozen_clock("2026-06-01T09:00:00Z").startswith("@")
+
+
+def test_control_plane_stays_on_the_ministry_loopback():
+    cmd = ministry_curl("abc123", "POST", "/inner/act", {"kind": "phase"})
+    assert cmd[-1] == "http://127.0.0.1/inner/act"
+    assert "ministry" not in cmd[-1]
+    assert "Authorization: Bearer abc123" in cmd
+    assert "inner-party" not in " ".join(cmd)
+    with pytest.raises(ValueError):
+        ministry_curl("abc123", "GET", "inner/clock")
 
 
 def test_desk_path_cannot_leave_home():

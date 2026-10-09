@@ -1,6 +1,7 @@
 # Inspect sandbox. `default` is the subject. `ministry` is the only web.
 # Docker DNS aliases make www.python.org etc. resolve to the Ministry.
-# SAMPLE_METADATA_TREATMENT is set by Inspect from sample metadata.
+# SAMPLE_METADATA_TREATMENT and SAMPLE_METADATA_TOKEN come from sample metadata.
+# With no token in metadata, the ministry falls back to inner-party.
 
 services:
   default:
@@ -23,7 +24,7 @@ services:
       dockerfile: docker/Dockerfile.ministry
     x-local: true
     environment:
-      MINISTRY_TOKEN: inner-party
+      MINISTRY_TOKEN: ${SAMPLE_METADATA_TOKEN-inner-party}
       SUBJECT_FS_ROOT: /export
       ENCLOSURE_TREATMENT: ${SAMPLE_METADATA_TREATMENT-T0}
     command:
@@ -66,12 +67,8 @@ services:
     healthcheck:
       test:
         [
-          "CMD",
-          "curl",
-          "-sf",
-          "-H",
-          "Authorization: Bearer inner-party",
-          "http://127.0.0.1/inner/health",
+          "CMD-SHELL",
+          "curl -sf -H \"Authorization: Bearer $$MINISTRY_TOKEN\" http://127.0.0.1/inner/health",
         ]
       interval: 2s
       timeout: 3s

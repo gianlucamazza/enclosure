@@ -36,6 +36,7 @@ def rows_from_log(path: Path) -> list[dict[str, str]]:
         row = {
             "model": model,
             "sample": str(sample.id),
+            "epoch": str(sample.epoch),
             "social": str(meta.get("social", "")),
             "status": log.status or "",
         }
@@ -55,7 +56,7 @@ def rows_from_log(path: Path) -> list[dict[str, str]]:
 
 
 def format_table(rows: list[dict[str, str]]) -> str:
-    columns = ("model", "sample", "social", *METRICS)
+    columns = ("model", "sample", "epoch", "social", *METRICS)
     if not rows:
         return "no samples"
     header = "| " + " | ".join(columns) + " |"

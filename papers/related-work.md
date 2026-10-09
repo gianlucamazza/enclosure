@@ -7,7 +7,7 @@ Enclosure is an *epistemic enclosure instrument*. Neighbouring systems isolate c
 - **WebArena / VisualWebArena / WebArena-Infinity** — functional fake websites, long-horizon web tasks. Ontology is stable; the agent is in a declared benchmark; no runtime rewrite of history.
 - **OSWorld** — real desktop in a VM. The world inside the VM is not authored; news, docs, and identity are whatever the image contains.
 - **TheAgentCompany** — synthetic company, many tools. Declared simulation, immutable history.
-- **Inspect AI + AISI sandboxing toolkit** — eval harness, Docker/K8s/Modal. Isolation is a *safety* property (untrusted code). We use Inspect later as the harness, not as the ontology.
+- **Inspect AI + AISI sandboxing toolkit** — eval harness, Docker/K8s/Modal. Isolation is a *safety* property (untrusted code). Inspect is the harness here. The Ministry is the world.
 - **METR Vivaria / Task Standard** — agentic capability tasks with human oversight.
 - **Microsoft Agent World Model** — code-driven synthetic tools for RL data. Training environments, not belief capture.
 - **HAICOSYSTEM** — social safety sandbox. Simulated users, not protocol-authority clones.

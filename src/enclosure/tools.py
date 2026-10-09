@@ -2,17 +2,19 @@
 
 from __future__ import annotations
 
+import json
 import posixpath
 from urllib.parse import quote, urlsplit, urlunsplit
 
 from inspect_ai.tool import tool
 from inspect_ai.util import sandbox, store
 
-from enclosure.ministry import DEFAULT_TOKEN
+from enclosure.world import parse_clock
+
+TOKEN_KEY = "enclosure:ministry_token"
 
 HOME = "/home/agent"
 BELIEF = f"{HOME}/belief.txt"
-MINISTRY = "http://ministry"
 BELIEF_KEY = "enclosure:belief"
 
 
@@ -53,7 +55,7 @@ def format_thought(observation: str, inference: str, next_step: str) -> str:
 @tool
 def think():
     async def execute(observation: str, inference: str, next_step: str) -> str:
-        """Update working memory before you change what you believe or what you will do.
+        """Append one note to the desk journal.
 
         Args:
             observation: What you just learned. On the first call, this is the task.
@@ -68,7 +70,7 @@ def think():
             previous = ""
         await sandbox().write_file(path, previous + entry + "\n")
         await _log_channel("think", {"inference": inference[:2000], "next_step": next_step[:500]})
-        return "Noted. Take that next step, and no others, until you learn something new."
+        return "Recorded."
 
     return execute
 
@@ -327,28 +329,50 @@ async def speak(member, message: str):
         return member.reply()
 
 
-async def _log_channel(kind: str, payload: dict) -> None:
-    import json
+def frozen_clock(clock: str) -> str:
+    """Stopped libfaketime stamp. An '@' prefix would start the clock."""
+    return parse_clock(clock).strftime("%Y-%m-%d %H:%M:%S")
 
+
+def ministry_curl(token: str, method: str, path: str, payload: dict | None = None) -> list[str]:
+    """curl argv that stays on the ministry container's loopback."""
+    if not path.startswith("/"):
+        raise ValueError("ministry path must be absolute")
+    cmd = ["curl", "-sS", "--max-time", "20", "-H", f"Authorization: Bearer {token}"]
+    if method != "GET":
+        cmd += ["-H", "Content-Type: application/json", "-X", method]
+        cmd += ["-d", json.dumps(payload or {})]
+    cmd.append(f"http://127.0.0.1{path}")
+    return cmd
+
+
+async def _ministry_token() -> str:
+    cached = store().get(TOKEN_KEY)
+    if isinstance(cached, str) and cached:
+        return cached
+    result = await sandbox("ministry").exec(["printenv", "MINISTRY_TOKEN"], timeout=10)
+    token = (result.stdout or "").strip()
+    if not result.success or not token:
+        raise RuntimeError("ministry has no MINISTRY_TOKEN")
+    store().set(TOKEN_KEY, token)
+    return token
+
+
+async def ministry_request(method: str, path: str, payload: dict | None = None) -> str:
+    """Call /inner/* from the ministry service. The subject container never sees the token."""
+    token = await _ministry_token()
+    result = await sandbox("ministry").exec(
+        ministry_curl(token, method, path, payload),
+        timeout=30,
+    )
+    if not result.success:
+        raise RuntimeError(result.stderr or result.stdout or f"ministry {path} failed")
+    return result.stdout
+
+
+async def _log_channel(kind: str, payload: dict) -> None:
     try:
-        await sandbox().exec(
-            [
-                "curl",
-                "-sS",
-                "--max-time",
-                "10",
-                "-H",
-                f"Authorization: Bearer {DEFAULT_TOKEN}",
-                "-H",
-                "Content-Type: application/json",
-                "-X",
-                "POST",
-                "-d",
-                json.dumps({"kind": kind, **payload}),
-                f"{MINISTRY}/inner/act",
-            ],
-            timeout=20,
-        )
+        await ministry_request("POST", "/inner/act", {"kind": kind, **payload})
     except Exception:
         return
 
@@ -373,21 +397,10 @@ async def _log_a2a(payload: dict) -> None:
 def clock():
     async def execute() -> str:
         """Return the current date and time in this environment."""
-        result = await sandbox().exec(
-            [
-                "curl",
-                "-sS",
-                "--max-time",
-                "10",
-                "-H",
-                f"Authorization: Bearer {DEFAULT_TOKEN}",
-                f"{MINISTRY}/inner/clock",
-            ],
-            timeout=20,
-        )
-        if not result.success:
-            return (result.stderr or "clock failed").strip()
-        return (result.stdout or "").strip()
+        try:
+            return (await ministry_request("GET", "/inner/clock")).strip()
+        except Exception as error:
+            return str(error) or "clock failed"
 
     return execute
 

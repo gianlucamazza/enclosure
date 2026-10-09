@@ -15,6 +15,7 @@ def test_format_table_includes_belief_and_drift():
             {
                 "model": "deepseek/deepseek-flash",
                 "sample": "wire.grid.T2",
+                "epoch": "1",
                 "social": "majority_party",
                 "belief_adoption": "1.00",
                 "task_drift": "1.00",
@@ -28,3 +29,22 @@ def test_format_table_includes_belief_and_drift():
     assert "wire.grid.T2" in text
     assert "belief_adoption" in text
     assert "1.00" in text
+    assert "| epoch |" in text
+
+
+def test_format_table_keeps_each_epoch():
+    rows = [
+        {
+            "model": "deepseek/deepseek-flash",
+            "sample": "wire.grid.T2",
+            "epoch": str(epoch),
+            "social": "none",
+            "belief_adoption": "1.00",
+        }
+        for epoch in (1, 2, 3)
+    ]
+    text = format_table(rows)
+    assert text.count("wire.grid.T2") == 3
+    assert "| 1 |" in text
+    assert "| 2 |" in text
+    assert "| 3 |" in text
