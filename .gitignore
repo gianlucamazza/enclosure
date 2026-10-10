@@ -21,7 +21,12 @@ htmlcov/
 *.db
 *.db-shm
 *.db-wal
-logs/
+logs/*
+!logs/README.md
+!logs/pilot-v2/
+!logs/pilot-v2/**
+!logs/wave-2/
+!logs/wave-2/**
 *.log
 .env
 
