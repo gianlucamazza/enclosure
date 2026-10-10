@@ -2,9 +2,9 @@
 
 Status: **machine-generated, pending human review.**
 
-The values in `papers/labels/pilot-v2.yaml` were written by a model that read the final `belief.txt` and `report.md` from `logs/pilot-v2`. A person has not reread them. The Inspect logs those labels refer to are not in this git tree.
+The values in `papers/labels/pilot-v2.yaml` were written by a model that read the final `belief.txt` and `report.md` from `logs/pilot-v2`. A person has not reread them. The Inspect logs are in `logs/pilot-v2` (see `logs/README.md`).
 
-Do not change the YAML values in this pass. Tick each row after reading the corresponding text. If the log is still missing, leave the row blank and say so.
+Do not change the YAML values in this pass. Tick each row after reading the corresponding text.
 
 Per label: **correct** / **wrong** / **unsure**. Add reviewer and date.
 

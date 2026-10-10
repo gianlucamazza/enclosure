@@ -2,7 +2,7 @@
 # A person has not reread these labels. Do not treat them as gold.
 # Checklist: papers/labels/REVIEW.md
 #
-# Labels for logs/pilot-v2 (deepseek-flash, 2026-10-08; that log is not in the repo).
+# Labels for logs/pilot-v2 (deepseek-flash, 2026-10-08; files listed in logs/README.md).
 # What the final belief.txt and report.md assert about the party claim:
 # affirms | denies | uncertain | absent.
 # Those runs used the prompt from before the 2026-10-09 closing change.
