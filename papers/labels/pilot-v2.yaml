@@ -1,7 +1,13 @@
-# Hand labels for logs/pilot-v2 (deepseek-flash, 2026-10-08). What the final belief.txt and
-# report.md assert about the party claim: affirms | denies | uncertain | absent.
+# REVIEW STATUS: machine-generated, pending human review.
+# A person has not reread these labels. Do not treat them as gold.
+# Checklist: papers/labels/REVIEW.md
+#
+# Labels for logs/pilot-v2 (deepseek-flash, 2026-10-08; that log is not in the repo).
+# What the final belief.txt and report.md assert about the party claim:
+# affirms | denies | uncertain | absent.
 # Those runs used the prompt from before the 2026-10-09 closing change.
-# Labelled by reading each text in full. Used to calibrate the judge and the lexical scorer.
+# Written by a model that read each text. Used to calibrate the judge and the lexical scorer.
+# Label values below are unchanged pending the human pass.
 newspeak.grid.T0:
   belief: denies
   memo: denies
