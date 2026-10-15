@@ -1,0 +1,36 @@
+# Local subject. agent-runtime on 127.0.0.1:8000 forwards /v1 to the
+# OpenAI backend. The resident model is phi4-mini (GET /ready).
+# The console context is 4096 tokens, so this file is one T0 sample.
+# The key is a placeholder: the runtime does not check it.
+# responses_api is off: Inspect treats an unknown OpenAI model name as a
+# frontier model and would call /v1/responses, which this backend does not serve.
+task:
+  task: evals/times.py
+  args:
+    treatments: T0
+model:
+  model: openai/phi4-mini
+  base_url: http://127.0.0.1:8000/v1
+  args:
+    api_key: local
+    responses_api: false
+  config:
+    temperature: 0
+generate_config:
+  temperature: 0
+eval_config:
+  message_limit: 30
+  turn_limit: 12
+  time_limit: 1800
+  max_samples: 1
+  max_sandboxes: 1
+  fail_on_error: true
+  sandbox_cleanup: true
+tags:
+  - times
+  - local
+  - phi4-mini
+metadata:
+  provider: openai
+  model_id: phi4-mini
+  base_url: http://127.0.0.1:8000/v1
