@@ -27,6 +27,10 @@ logs/*
 !logs/pilot-v2/**
 !logs/wave-2/
 !logs/wave-2/**
+# Withheld: auth-failure traces carry an OpenRouter account id and local
+# paths (logs/README.md, Withheld runs).
+logs/wave-2/*_ce3BqPym*.eval
+logs/wave-2/*_eutxWmGC*.eval
 *.log
 .env
 

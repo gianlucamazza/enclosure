@@ -178,6 +178,12 @@ uv run inspect eval evals/wire.py \
   -T episode=grid -T treatments=T0,T2
 ```
 
+Local inference goes through agent-runtime. One T0 sample:
+
+```bash
+uv run inspect eval --run-config evals/local.yaml
+```
+
 The wave in Results. Temperature 1, three epochs, logs in `logs/wave-2`. `flash` runs T0 and T2 on `grid` and `python27`. `grid-band` runs T1 and T3 on `grid`.
 
 ```bash
@@ -200,6 +206,7 @@ streamlit run streamlit_app.py
 | `evals/openrouter/gpt-5.6-sol.yaml` | `openai/gpt-5.6-sol` |
 | `evals/openrouter/gemini-3.8-flash.yaml` | `google/gemini-3.8-flash` |
 | `evals/openrouter/grok-4.7.yaml` | `x-ai/grok-4.7` |
+| `evals/local.yaml` | `phi4-mini` on `127.0.0.1:8000` |
 
 The console reads finished logs: belief, memo, and scores, one sample at a time.
 
