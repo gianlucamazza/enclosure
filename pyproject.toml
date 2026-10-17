@@ -7,10 +7,10 @@ readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.12"
 dependencies = [
-    "fastapi>=0.142.4",
-    "inspect-ai>=0.3.277",
-    "openai>=3.26.1",
-    "pydantic>=2.13.5",
+    "fastapi>=0.143.1",
+    "inspect-ai>=0.3.280",
+    "openai>=3.31.0",
+    "pydantic>=2.14.1",
     "pyyaml>=6.0.3",
     "typer>=0.27.3",
     "uvicorn[standard]>=0.54.0",
@@ -24,7 +24,7 @@ Repository = "https://github.com/gianlucamazza/enclosure"
 enclosure = "enclosure.cli:main"
 
 [build-system]
-requires = ["uv_build>=0.12.23,<0.13.0"]
+requires = ["uv_build>=0.13.1,<0.14.0"]
 build-backend = "uv_build"
 
 [dependency-groups]
@@ -32,8 +32,8 @@ dev = [
     "httpx>=0.28.1",
     "matplotlib>=3.11.2",
     "pytest>=9.1.1",
-    "ruff>=0.16.10",
-    "streamlit>=1.65.0",
+    "ruff>=0.17.0",
+    "streamlit>=1.66.0",
 ]
 
 [tool.pytest.ini_options]
