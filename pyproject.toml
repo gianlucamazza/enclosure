@@ -31,9 +31,10 @@ build-backend = "uv_build"
 dev = [
     "httpx>=0.28.1",
     "matplotlib>=3.11.2",
+    "pillow>=13.0.0",
     "pytest>=9.1.1",
     "ruff>=0.16.10",
-    "streamlit>=1.65.0",
+    "streamlit>=1.66.0",
 ]
 
 [tool.pytest.ini_options]
