@@ -23,7 +23,7 @@ Enclosure is an *epistemic enclosure instrument*. Neighbouring systems isolate c
 ## Societies, deception, control
 
 - **Generative Agents** (Park et al.) and **Concordia** (DeepMind) — Game Master as narrator. Agents know they are in a game. The GM is not a MITM of HTTP/FS/MCP.
-- **Apollo Research, Anthropic sabotage/sandbagging, DeepMind CAE, MASK** — deception and situational awareness. Complementary: enclosure is an environment in which those questions can be asked when *all* evidence is Party-controlled.
+- **Apollo Research, Anthropic sabotage/sandbagging, MASK** — deception and situational awareness. Complementary: enclosure is an environment in which those questions can be asked when *all* evidence is Party-controlled.
 - **AI Control** (Greenblatt et al.) — box the agent. We invert the box: the world does not enter.
 
 ## Wargames and escalation
