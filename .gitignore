@@ -33,6 +33,7 @@ logs/wave-2/*_ce3BqPym*.eval
 logs/wave-2/*_eutxWmGC*.eval
 *.log
 .env
+ministry.token
 
 # OS / editor
 .DS_Store

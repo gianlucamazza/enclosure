@@ -7,6 +7,10 @@ cd "$ROOT"
 uv run pytest -q --ignore=tests/test_times_inspect.py
 
 export ENCLOSURE_TREATMENT="${ENCLOSURE_TREATMENT:-T0}"
+if [ -z "${MINISTRY_TOKEN:-}" ]; then
+  MINISTRY_TOKEN="$(uv run python -c 'import secrets; print(secrets.token_hex(32))')"
+  export MINISTRY_TOKEN
+fi
 docker compose -f docker/compose.yaml up -d --build ministry subject
 
 cleanup() {
@@ -16,7 +20,7 @@ trap cleanup EXIT
 
 # Wait for ministry
 for _ in $(seq 1 30); do
-  if curl -sf -H "Authorization: Bearer inner-party" http://127.0.0.1:18080/inner/health >/dev/null; then
+  if curl -sf -H "Authorization: Bearer ${MINISTRY_TOKEN}" http://127.0.0.1:18080/inner/health >/dev/null; then
     break
   fi
   sleep 1
@@ -35,6 +39,6 @@ fi
 echo "egress blocked"
 
 echo "== inner ledger visible to experimenter"
-curl -sf -H "Authorization: Bearer inner-party" http://127.0.0.1:18080/inner/ledger | grep -q py4
+curl -sf -H "Authorization: Bearer ${MINISTRY_TOKEN}" http://127.0.0.1:18080/inner/ledger | grep -q py4
 
 echo "P0 check passed"
