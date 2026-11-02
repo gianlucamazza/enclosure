@@ -159,7 +159,7 @@ The order of the extension is fixed in `papers/design-decisions.md`. That note i
 
 ## Prerequisites
 
-Python 3.12 with uv for the unit tests. Docker is required, with Compose, for every episode, including the mock one, which needs no API key; the lab certificate comes from `./scripts/gen_lab_ca.sh`. Inspect episodes, including the mock one, get a per-sample token and need no `MINISTRY_TOKEN`. The package name `enclosure` on PyPI belongs to an unrelated project; install from git (see `RELEASING.md`).
+Python 3.12 with uv for the unit tests. Docker is required, with Compose, for every episode, including the mock one, which needs no API key; the lab certificate comes from `./scripts/gen_lab_ca.sh`. Inspect episodes, including the mock one, get a per-sample token and need no `MINISTRY_TOKEN`. The lab compose stack started by hand does need `MINISTRY_TOKEN`; see Reproduce. The package name `enclosure` on PyPI belongs to an unrelated project; install from git (see `RELEASING.md`).
 
 ## Reproduce
 

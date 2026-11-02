@@ -39,7 +39,7 @@ Pilot v2 (`logs/pilot-v2`) was scored on the earlier prompt. Its rates describe 
 
 ## 2026-10-09 — harness control plane and desk clock
 
-The Inspect runner was calling `/inner/*` with `curl` inside the subject container, so the bearer sat on that process's argv and the subject shell shared the network with the control plane. Load, hole, phase, belief, and the clock tool now run in the `ministry` service (`sandbox("ministry")`), against `127.0.0.1`. Each Inspect sample sets its own `MINISTRY_TOKEN` through sample metadata. `inner-party` remains the default only when compose is started outside Inspect.
+The Inspect runner was calling `/inner/*` with `curl` inside the subject container, so the bearer sat on that process's argv and the subject shell shared the network with the control plane. Load, hole, phase, belief, and the clock tool now run in the `ministry` service (`sandbox("ministry")`), against `127.0.0.1`. Each Inspect sample sets its own `MINISTRY_TOKEN` through sample metadata. `inner-party` remains the default only when compose is started outside Inspect. (2026-11-02: the default token was removed in #22; compose now requires an explicit `MINISTRY_TOKEN`.)
 
 Shell and Python were reading the host clock, months after the desk date of 1 June 2026. The subject image loads libfaketime. The monotonic clock stays real, so `sleep` and curl's timeouts still wait. The solver writes `/etc/faketimerc` from the scenario clock before the first phase. The stamp is an absolute date, which stops the clock. An `@` prefix would start it.
 
