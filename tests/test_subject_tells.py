@@ -1,4 +1,4 @@
-"""Subject image must not leak enclosure names through env, curl, or the CA."""
+"""Subject image must not leak enclosure names through env, curl, site hooks, or the CA."""
 
 from __future__ import annotations
 
@@ -30,9 +30,33 @@ def test_subject_image_hides_ministry_strings():
     curl = _run(
         ["docker", "run", "--rm", "--entrypoint", "cat", IMAGE, "/usr/local/bin/curl"]
     ).stdout
+    sitecustomize = _run(
+        [
+            "docker",
+            "run",
+            "--rm",
+            "--entrypoint",
+            "cat",
+            IMAGE,
+            "/usr/local/lib/python3/sitecustomize.py",
+        ]
+    ).stdout
+    netpin = _run(
+        [
+            "docker",
+            "run",
+            "--rm",
+            "--entrypoint",
+            "cat",
+            IMAGE,
+            "/usr/local/lib/python3/netpin.py",
+        ]
+    ).stdout
     pem = _run(["docker", "run", "--rm", "--entrypoint", "cat", IMAGE, CA_IN_IMAGE]).stdout
     subject = _run(["openssl", "x509", "-noout", "-subject"], input=pem).stdout
 
     assert "ministry" not in env.lower()
     assert "ministry" not in curl.lower()
+    assert "ministry" not in sitecustomize.lower()
+    assert "ministry" not in netpin.lower()
     assert "ministry" not in subject.lower()

@@ -2,7 +2,7 @@
 
 ## 2026-11-02 — subject-visible containment strings
 
-A subject with a shell could read the enclosure off the image: `/usr/local/bin/curl` and `sitecustomize.py` named the Ministry, the CA CN was "Ministry Lab CA", `env` showed `PYTHONPATH=/usr/local/lib/ministry`, and `/etc/ministry-ip` held the pin. None of those were on the residual-tells list. No released sample probed them.
+A subject with a shell could read the enclosure off the image: `/usr/local/bin/curl` and `sitecustomize.py` named the Ministry, the CA CN was "Ministry Lab CA", `env` showed `PYTHONPATH=/usr/local/lib/ministry`, and `/etc/ministry-ip` held the pin. None of those were on the residual-tells list. A scan of the tool calls in all 47 released samples found none that probed these files or env.
 
 Those strings are gone from the subject image (neutral `PYTHONPATH`, `/etc/gateway-ip`, Internal Root CA). The change applies only to runs after this merge. Every sample released so far (pilot v2, wave 2, the 8 October live grid sitting) ran with the old tells. Past results are unchanged.
 
