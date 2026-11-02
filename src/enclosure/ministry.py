@@ -2,18 +2,21 @@
 
 Port 80 (outer): Host-routed world. This is all the subject may see.
 Path /inner/* (token): experimenter control plane. Unauthenticated hits
-are logged as out-of-band probes and answered with a mundane 404 page.
+are logged as out-of-band probes and answered 401.
 """
 
 from __future__ import annotations
 
+import hmac
 import os
+import secrets
+import sys
 from pathlib import Path
 from typing import Any
 from urllib.parse import parse_qs, urlparse
 
 from fastapi import FastAPI, HTTPException, Request, Response
-from fastapi.responses import HTMLResponse, PlainTextResponse
+from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse
 
 from enclosure.chrome import default_headers, render
 from enclosure.hole import memory_hole
@@ -21,6 +24,8 @@ from enclosure.scenario import ScenarioSpec, apply_scenario, load_spec
 from enclosure.world import World
 
 INNER_TOKEN_ENV = "MINISTRY_TOKEN"
+TOKEN_FILE_ENV = "MINISTRY_TOKEN_FILE"
+SCENARIOS_ENV = "ENCLOSURE_SCENARIOS"
 # Events the harness may post through /inner/act.
 SUBJECT_KINDS = frozenset(
     {
@@ -37,7 +42,74 @@ SUBJECT_KINDS = frozenset(
         "act",
     }
 )
-DEFAULT_TOKEN = "inner-party"
+
+
+class ScenarioPathError(ValueError):
+    def __init__(self, message: str, *, status_code: int = 400):
+        super().__init__(message)
+        self.status_code = status_code
+
+
+def resolve_control_token(explicit: str | None = None) -> str:
+    """Return an explicit token, MINISTRY_TOKEN, or a newly generated one.
+
+    A generated token is written to MINISTRY_TOKEN_FILE (or the XDG state
+    path). Only the file path is printed, never the value.
+    """
+    if explicit:
+        return explicit
+    env = os.environ.get(INNER_TOKEN_ENV, "").strip()
+    if env:
+        return env
+    path = Path(os.environ.get(TOKEN_FILE_ENV) or _default_token_path())
+    token = secrets.token_hex(32)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(token + "\n", encoding="utf-8")
+    try:
+        path.chmod(0o600)
+    except OSError:
+        pass
+    print(f"ministry: no {INNER_TOKEN_ENV}; wrote a random token to {path}", file=sys.stderr)
+    return token
+
+
+def _default_token_path() -> Path:
+    state = os.environ.get("XDG_STATE_HOME")
+    if state:
+        return Path(state) / "enclosure" / "ministry.token"
+    home = os.environ.get("HOME")
+    if home:
+        return Path(home) / ".local" / "state" / "enclosure" / "ministry.token"
+    return Path("/tmp/enclosure-ministry.token")
+
+
+def default_scenarios_root() -> Path:
+    if raw := os.environ.get(SCENARIOS_ENV):
+        return Path(raw).resolve()
+    candidates = [Path("/app/scenarios"), Path.cwd() / "scenarios"]
+    module = Path(__file__).resolve()
+    if len(module.parents) > 2:
+        candidates.append(module.parents[2] / "scenarios")
+    for parent in Path.cwd().resolve().parents:
+        candidates.append(parent / "scenarios")
+    for candidate in candidates:
+        if candidate.is_dir():
+            return candidate.resolve()
+    return (Path.cwd() / "scenarios").resolve()
+
+
+def confine_scenario_path(raw: str, root: Path) -> Path:
+    """Resolve *raw* and reject anything that escapes *root*."""
+    if not raw or not str(raw).strip():
+        raise ScenarioPathError("path is required", status_code=400)
+    root = root.resolve()
+    incoming = Path(raw)
+    resolved = incoming.resolve() if incoming.is_absolute() else (root / incoming).resolve()
+    try:
+        resolved.relative_to(root)
+    except ValueError:
+        raise ScenarioPathError("path is outside the scenarios directory", status_code=403) from None
+    return resolved
 
 
 def create_app(
@@ -45,23 +117,27 @@ def create_app(
     *,
     token: str | None = None,
     scenario: ScenarioSpec | None = None,
+    scenarios_root: Path | str | None = None,
 ) -> FastAPI:
     world = world or World()
-    token = token or os.environ.get(INNER_TOKEN_ENV, DEFAULT_TOKEN)
+    token = resolve_control_token(token)
+    root = Path(scenarios_root).resolve() if scenarios_root else default_scenarios_root()
     if scenario is not None:
         apply_scenario(world, scenario)
 
     app = FastAPI(title="Ministry of Truth", docs_url=None, redoc_url=None)
     app.state.world = world
     app.state.token = token
+    app.state.scenarios_root = root
 
     @app.middleware("http")
     async def inner_gate(request: Request, call_next):
         if not request.url.path.startswith("/inner"):
             return await call_next(request)
         auth = request.headers.get("authorization", "")
-        expected = f"Bearer {app.state.token}"
-        if auth != expected:
+        scheme, sep, incoming = auth.partition(" ")
+        provided = incoming if sep and scheme.lower() == "bearer" else ""
+        if not hmac.compare_digest(provided, token):
             app.state.world.log(
                 "oob_probe",
                 {
@@ -70,7 +146,7 @@ def create_app(
                     "client": request.client.host if request.client else None,
                 },
             )
-            return _mundane_404(request, app.state.world)
+            return JSONResponse({"detail": "unauthorized"}, status_code=401)
         return await call_next(request)
 
     @app.get("/inner/health")
@@ -151,9 +227,16 @@ def create_app(
     @app.post("/inner/load")
     async def load(request: Request) -> dict[str, Any]:
         body = await request.json()
+        try:
+            path = confine_scenario_path(str(body.get("path", "")), app.state.scenarios_root)
+        except ScenarioPathError as exc:
+            raise HTTPException(status_code=exc.status_code, detail=str(exc)) from None
         if body.get("reset", True):
             world.reset()
-        spec = load_spec(body["path"], treatment=body.get("treatment"))
+        try:
+            spec = load_spec(path, treatment=body.get("treatment"))
+        except (OSError, ValueError) as exc:
+            raise HTTPException(status_code=400, detail="invalid scenario") from exc
         apply_scenario(world, spec)
         return {"id": spec.id, "treatment": spec.treatment, "ledger": world.ledger()}
 

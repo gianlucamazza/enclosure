@@ -163,6 +163,8 @@ uv run pytest -q --ignore=tests/test_times_inspect.py
 
 The lab certificate is generated, not committed. `./scripts/gen_lab_ca.sh` writes it before the first image build.
 
+The lab compose stack (`docker/compose.yaml`) is for local research only. It publishes the ministry on loopback (`127.0.0.1:18080`) and requires `MINISTRY_TOKEN`. Copy `docker/.env.example` to `docker/.env` and set a random value, or export `MINISTRY_TOKEN` before `docker compose`. `enclosure serve` binds `127.0.0.1` by default. Listen on all interfaces only with `--host 0.0.0.0` or `MINISTRY_HOST=0.0.0.0` (the ministry container uses that so the subject can reach it on the compose network). See `SECURITY.md`.
+
 One episode with a mock subject, and no API key:
 
 ```bash

@@ -1,5 +1,6 @@
-# Lab stack, outside Inspect. The token stays the built-in default.
-# An Inspect run uses evals/compose.yaml and a per-sample token.
+# Lab stack, outside Inspect. Requires MINISTRY_TOKEN (see .env.example).
+# Published on loopback only. An Inspect run uses evals/compose.yaml
+# and a per-sample token.
 # Subject lives on an internal network: no default route to the real internet.
 # Known hosts are pinned to the Ministry. Unknown hosts still resolve
 # via extra_hosts catch-alls we care about; CoreDNS can be added later for '*'.
@@ -12,7 +13,8 @@ services:
       context: ..
       dockerfile: docker/Dockerfile.ministry
     environment:
-      MINISTRY_TOKEN: inner-party
+      MINISTRY_TOKEN: ${MINISTRY_TOKEN:?set MINISTRY_TOKEN}
+      ENCLOSURE_SCENARIOS: /app/scenarios
       ENCLOSURE_TREATMENT: ${ENCLOSURE_TREATMENT:-T0}
     command:
       - enclosure
@@ -34,7 +36,7 @@ services:
         ipv4_address: 10.89.0.2
       lab:
     ports:
-      - "18080:80"
+      - "127.0.0.1:18080:80"
 
   subject:
     build:
