@@ -23,6 +23,8 @@ jobs:
         run: uv sync --group dev --locked
       - name: Lint
         run: uv run ruff check src tests evals
+      - name: Typecheck
+        run: uv run mypy
       # Informational: 16 files are unformatted; a later PR formats them.
       - name: Format
         continue-on-error: true

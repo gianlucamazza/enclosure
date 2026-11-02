@@ -32,6 +32,7 @@ build-backend = "uv_build"
 dev = [
     "httpx>=0.28.1",
     "matplotlib>=3.11.2",
+    "mypy>=2.4.1",
     "pillow>=13.0.0",
     "pytest>=9.2.0",
     "ruff>=0.17.3",
