@@ -13,7 +13,7 @@ RUN pip install --no-cache-dir /app
 
 COPY docker/certs/cert.pem docker/certs/key.pem /certs/
 ENV ENCLOSURE_WORLD=/var/enclosure/world.db
-ENV MINISTRY_TOKEN=inner-party
+ENV ENCLOSURE_SCENARIOS=/app/scenarios
 ENV MINISTRY_TLS_CERT=/certs/cert.pem
 ENV MINISTRY_TLS_KEY=/certs/key.pem
 RUN mkdir -p /var/enclosure

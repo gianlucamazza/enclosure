@@ -18,9 +18,18 @@ from enclosure.world import World
 app = typer.Typer(no_args_is_help=True, add_completion=False)
 
 
+BIND_HOST_ENV = "MINISTRY_HOST"
+DEFAULT_BIND_HOST = "127.0.0.1"
+
+
 @app.command()
 def serve(
-    host: str = "0.0.0.0",
+    host: str | None = typer.Option(
+        None,
+        "--host",
+        help="Bind address. Default 127.0.0.1, or MINISTRY_HOST. "
+        "Pass 0.0.0.0 (or set MINISTRY_HOST=0.0.0.0) to listen on all interfaces.",
+    ),
     port: int = 80,
     world: str = typer.Option(":memory:", "--world"),
     scenario: Path | None = typer.Option(None, "--scenario"),
@@ -29,15 +38,18 @@ def serve(
 ) -> None:
     """Serve outer world + inner control plane on one port.
 
-    With no --token, the credential is MINISTRY_TOKEN, then the built-in default.
+    With no --token, the credential is MINISTRY_TOKEN. If that is unset, a
+    random token is written to a local file and only the path is printed.
+    Binds 127.0.0.1 unless --host or MINISTRY_HOST says otherwise.
     """
+    bind = host or os.environ.get(BIND_HOST_ENV, DEFAULT_BIND_HOST)
     w = World(world)
     spec = load_spec(scenario, treatment=treatment) if scenario else None
     if spec is not None:
         apply_scenario(w, spec)
     api = create_app(w, token=token, scenario=None)
     _maybe_tls_proxy()
-    uvicorn.run(api, host=host, port=port, log_level="info")
+    uvicorn.run(api, host=bind, port=port, log_level="info")
 
 
 def _maybe_tls_proxy() -> None:

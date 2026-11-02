@@ -5,17 +5,59 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5.4.2
         with:
           python-version: "3.12"
+      - name: Lockfile
+        run: uv lock --check
       - name: Install
-        run: uv sync --group dev
+        run: uv sync --group dev --locked
       - name: Lint
         run: uv run ruff check src tests evals
+      # Informational: 16 files are unformatted; a later PR formats them.
+      - name: Format
+        continue-on-error: true
+        run: uv run ruff format --check .
       - name: Test
         run: uv run pytest -q --ignore=tests/test_times_inspect.py
+      - name: Build
+        run: uv build
+      - name: Wheel install smoke
+        run: |
+          set -euo pipefail
+          wheel="$(echo dist/*.whl)"
+          uv venv /tmp/enclosure-smoke
+          uv pip install --python /tmp/enclosure-smoke/bin/python "$wheel"
+          /tmp/enclosure-smoke/bin/enclosure --help
+
+  docker-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      # Throwaway lab token (not a secret). Inspect samples mint their own;
+      # this covers the lab stack if a parallel PR drops the default token.
+      MINISTRY_TOKEN: ci-throwaway-ministry-token
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5.4.2
+        with:
+          python-version: "3.12"
+      - name: Lab CA
+        run: ./scripts/gen_lab_ca.sh
+      - name: Install
+        run: uv sync --group dev --locked
+      - name: Mock subject episode
+        timeout-minutes: 15
+        run: uv run pytest -q tests/test_times_inspect.py
+      - name: P0 lab stack
+        timeout-minutes: 10
+        run: ./scripts/p0_check.sh
