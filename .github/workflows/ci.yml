@@ -55,6 +55,8 @@ jobs:
         run: ./scripts/gen_lab_ca.sh
       - name: Install
         run: uv sync --group dev --locked
+      - name: Ministry lock
+        run: ./scripts/check_ministry_lock.sh
       - name: Mock subject episode
         timeout-minutes: 15
         run: uv run pytest -q tests/test_times_inspect.py
