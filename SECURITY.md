@@ -16,9 +16,9 @@ The subject-facing world is a fixture. The `/inner/*` control plane is for the e
 
 ## Reporting a vulnerability
 
-Report privately through GitHub Security Advisories on this repository: Security → Advisories → New draft security advisory, or the "Report a vulnerability" form if private reporting is enabled.
+Use GitHub's **Report a vulnerability** form on this repository (Security tab → private advisory).
 
-Do not open a public issue for a vulnerability. Do not include exploit details in a public pull request.
+If that form is not available, open an issue asking for a private contact. Do not include vulnerability details in the issue or in a public pull request.
 
 ## Response
 

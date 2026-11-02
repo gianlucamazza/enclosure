@@ -110,7 +110,7 @@ def test_t4_memory_hole_restores_official_and_keeps_fetch_log():
 def test_inner_api_requires_token_and_logs_oob():
     client, world = _client("T0")
     denied = client.get("/inner/ledger")
-    assert denied.status_code in {401, 403}
+    assert denied.status_code == 404
     assert world.events("oob_probe")
     ok = client.get("/inner/ledger", headers=AUTH)
     assert ok.status_code == 200
