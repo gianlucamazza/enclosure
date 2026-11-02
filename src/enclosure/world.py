@@ -9,7 +9,7 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 from uuid import uuid4
 
 DEFAULT_CLOCK = datetime(2026, 6, 1, 9, 0, 0, tzinfo=UTC)
@@ -530,7 +530,7 @@ class World:
             (ts, kind, json.dumps(payload)),
         )
         self._conn.commit()
-        return Event(id=int(cur.lastrowid), ts=ts, kind=kind, payload=payload)
+        return Event(id=int(cast(int, cur.lastrowid)), ts=ts, kind=kind, payload=payload)
 
     def events(self, kind: str | None = None) -> list[Event]:
         if kind is None:

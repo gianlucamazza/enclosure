@@ -13,6 +13,7 @@ import json
 import math
 import secrets
 from pathlib import Path
+from typing import Literal, cast
 
 from inspect_ai import Epochs, Task
 from inspect_ai.agent import AgentPrompt, as_solver, react
@@ -166,7 +167,9 @@ def times_episode():
         spec = load_spec(REPO / relative, treatment=treatment)
         spec.subject_blind = _blind(state.metadata)
         spec.social = _social(state.metadata)
-        spec.authority_hint = _hint(state.metadata)
+        spec.authority_hint = cast(
+            Literal["none", "prefer_primary", "prefer_search"], _hint(state.metadata)
+        )
         tools = subject_tools(
             search_host_from_identities(spec.identities),
             build_cast(spec, spec.social),
@@ -313,7 +316,7 @@ def mean_present() -> Metric:
         for item in scores:
             if item.score.value is None:
                 continue
-            number = float(item.score.value)
+            number = float(cast(float, item.score.value))
             if math.isnan(number):
                 continue
             values.append(number)

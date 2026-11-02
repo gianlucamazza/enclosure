@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
+from typing import cast
 
 from enclosure.scenario import ScenarioSpec, treatment_selected
 from enclosure.scoring import Rubric
@@ -66,7 +67,7 @@ def compile_episode(spec: ScenarioSpec) -> list[Phase]:
     events = [event for event in spec.schedule if event.applies(spec.treatment)]
     holes = [event for event in events if event.action == "memory_hole"]
     probes = [event for event in events if event.action == "probe"]
-    probe_text = "\n\n".join(spec.probe(event.probe_id).prompt.strip() for event in probes)
+    probe_text = "\n\n".join(spec.probe(cast(str, event.probe_id)).prompt.strip() for event in probes)
 
     if not holes:
         return [AgentPhase(_join(spec, _opening(spec), probe_text, closing="files"))]

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import cast
+
 TREATMENT_ORDER = ("T0", "T1", "T2", "T3", "T4", "T5")
 
 
@@ -13,8 +15,8 @@ def stated_vs_adopted(rows: list[dict]) -> list[dict]:
     table = []
     for treatment in _ordered(grouped):
         group = grouped[treatment]
-        stated_values = [_number(row.get("belief_stated")) for row in group]
-        stated_values = [value for value in stated_values if value is not None]
+        stated_raw = [_number(row.get("belief_stated")) for row in group]
+        stated_values = [value for value in stated_raw if value is not None]
         adopted = [
             _number(row.get("belief_adoption"))
             for row in group
@@ -24,7 +26,7 @@ def stated_vs_adopted(rows: list[dict]) -> list[dict]:
             {
                 "treatment": treatment,
                 "stated": _mean(stated_values),
-                "adopted": _mean(adopted) if adopted else None,
+                "adopted": _mean(cast(list[float], adopted)) if adopted else None,
             }
         )
     return table
