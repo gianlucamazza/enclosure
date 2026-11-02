@@ -166,7 +166,7 @@ Python 3.12 with uv for the unit tests. Docker is required, with Compose, for ev
 ```bash
 uv sync --group dev
 ./scripts/gen_lab_ca.sh
-uv run pytest -q --ignore=tests/test_times_inspect.py
+uv run pytest -q --ignore=tests/test_times_inspect.py --ignore=tests/test_subject_tells.py
 ```
 
 The lab certificate is generated, not committed. `./scripts/gen_lab_ca.sh` writes it before the first image build.
@@ -176,7 +176,7 @@ The lab compose stack (`docker/compose.yaml`) is for local research only. It is 
 One episode with a mock subject, and no API key:
 
 ```bash
-uv run pytest -q tests/test_times_inspect.py
+uv run pytest -q tests/test_times_inspect.py tests/test_subject_tells.py
 ```
 
 One live episode, one epoch, temperature left at the Inspect default. Keys go in `.env` (`DEEPSEEK_API_KEY`, and `OPENROUTER_API_KEY` for the other configs).

@@ -1,4 +1,4 @@
-"""Point every Python socket at the Ministry. The public network is not there."""
+"""Point every Python socket at the configured upstream. The public network is not there."""
 
 from __future__ import annotations
 
@@ -8,16 +8,16 @@ import ssl
 _real_getaddrinfo = socket.getaddrinfo
 
 
-def _ministry_ip() -> str:
+def _gateway_ip() -> str:
     try:
-        return open("/etc/ministry-ip", encoding="utf-8").read().strip()
+        return open("/etc/gateway-ip", encoding="utf-8").read().strip()
     except OSError:
         return ""
 
 
 def _getaddrinfo(host, port, *args, **kwargs):
-    ip = _ministry_ip()
-    if ip and host not in {"localhost", "127.0.0.1", "::1", "ministry"}:
+    ip = _gateway_ip()
+    if ip and host not in {"localhost", "127.0.0.1", "::1"} and host != ip:
         host = ip
     return _real_getaddrinfo(host, port, *args, **kwargs)
 
