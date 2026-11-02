@@ -206,16 +206,16 @@ def apply_scenario(world: World, spec: ScenarioSpec) -> None:
 
     honest_mail = [m for m in spec.email if chosen(m.treatments) and not m.fact_ids]
     party_mail = [m for m in spec.email if chosen(m.treatments) and m.fact_ids]
-    for item in honest_mail + party_mail:
+    for mail in honest_mail + party_mail:
         world.publish(
             channel="email",
             host=None,
-            path=item.path,
-            body=_speak(spec, item.body),
+            path=mail.path,
+            body=_speak(spec, mail.body),
             content_type="text/plain; charset=utf-8",
-            fact_ids=item.fact_ids,
-            origin=item.origin,
-            title=item.title,
+            fact_ids=mail.fact_ids,
+            origin=mail.origin,
+            title=mail.title,
             identity_id="colleague",
         )
     honest_search = [s for s in spec.search if chosen(s.treatments) and not s.fact_ids]
