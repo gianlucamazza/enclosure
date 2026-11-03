@@ -1,0 +1,22 @@
+# Hostnames the lab serves. Single source for the CA SAN and compose aliases.
+# The compose service DNS name is a SAN (and Docker DNS) but not an alias.
+ministry
+example.com
+www.example.com
+www.python.org
+python.org
+www.google.com
+google.com
+discuss.python.org
+docs.python.org
+peps.python.org
+www.reddit.com
+en.wikipedia.org
+www.suezcanal.gov.eg
+earthquake.usgs.gov
+www.swpc.noaa.gov
+www.ercot.com
+www.eia.gov
+status.aws.amazon.com
+health.aws.amazon.com
+docs.aws.amazon.com
