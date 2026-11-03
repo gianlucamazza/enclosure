@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import asyncio
 import json
+import re
+import subprocess
 from dataclasses import dataclass, field
 
 import pytest
@@ -97,10 +99,10 @@ def test_safe_paths():
 
 def test_frozen_clock_and_ministry_curl_get_has_no_body():
     assert tools.frozen_clock("2026-06-01T09:00:00") == "2026-06-01 09:00:00"
-    cmd = tools.ministry_curl("test-token", "GET", "/inner/clock")
+    cmd = tools.ministry_curl("GET", "/inner/clock")
     assert "-X" not in cmd and "-d" not in cmd
     assert cmd[-1] == "http://127.0.0.1/inner/clock"
-    put = tools.ministry_curl("test-token", "PUT", "/inner/clock")
+    put = tools.ministry_curl("PUT", "/inner/clock")
     assert put[put.index("-X") + 1] == "PUT"
     assert put[put.index("-d") + 1] == "{}"
 
@@ -308,36 +310,71 @@ def test_log_channel_swallows_errors(monkeypatch):
     assert run(tools._log_channel("shell", {})) is None
 
 
-def test_ministry_token_cached_fetched_and_missing(monkeypatch):
-    box = FakeSandbox()
-    store = FakeStore()
-    monkeypatch.setattr(tools, "sandbox", lambda name=None: box)
-    monkeypatch.setattr(tools, "store", lambda: store)
-    box.results = [FakeResult(stdout="test-token\n")]
-    assert run(tools._ministry_token()) == "test-token"
-    assert store[tools.TOKEN_KEY] == "test-token"
-    assert run(tools._ministry_token()) == "test-token"
-    assert len(box.calls) == 1
-
-    store.clear()
-    box.results = [FakeResult(stdout="", success=True)]
-    with pytest.raises(RuntimeError, match="MINISTRY_TOKEN"):
-        run(tools._ministry_token())
-
-
 def test_ministry_request_uses_curl_and_raises_on_failure(monkeypatch):
     box = FakeSandbox()
-    store = FakeStore({tools.TOKEN_KEY: "test-token"})
     monkeypatch.setattr(tools, "sandbox", lambda name=None: box)
-    monkeypatch.setattr(tools, "store", lambda: store)
     box.results = [FakeResult(stdout='{"ok": true}')]
     out = run(tools.ministry_request("POST", "/inner/act", {"kind": "think"}))
     assert json.loads(out) == {"ok": True}
     cmd = box.calls[0][0]
-    assert cmd[0] == "curl" and "Authorization: Bearer test-token" in cmd
+    assert cmd[:2] == ["sh", "-c"] and "exec curl" in cmd[2]
     box.results = [FakeResult(stderr="refused", success=False)]
     with pytest.raises(RuntimeError, match="refused"):
         run(tools.ministry_request("GET", "/inner/clock"))
     box.results = [FakeResult(success=False)]
     with pytest.raises(RuntimeError, match="/inner/clock failed"):
         run(tools.ministry_request("GET", "/inner/clock"))
+
+
+def _fake_curl(tmp_path):
+    """A curl on PATH that prints each argument it gets on its own line."""
+    bindir = tmp_path / "bin"
+    bindir.mkdir()
+    curl = bindir / "curl"
+    curl.write_text('#!/bin/sh\nfor arg in "$@"; do printf \'%s\\n\' "$arg"; done\n')
+    curl.chmod(0o755)
+    return bindir
+
+
+def test_ministry_request_keeps_the_token_out_of_the_exec_call(monkeypatch, tmp_path):
+    token = "0123456789abcdef0123456789abcdef"
+    box = FakeSandbox()
+    monkeypatch.setattr(tools, "sandbox", lambda name=None: box)
+    run(tools.ministry_request("POST", "/inner/act", {"kind": "think"}))
+    cmd, kwargs = box.calls[0]
+    # Inspect logs argv, env, and input of every sandbox exec; none may hold the token.
+    assert token not in cmd
+    assert token not in " ".join(cmd)
+    assert not re.search(r"Bearer [0-9a-f]{8,}", " ".join(cmd))
+    assert "env" not in kwargs and "input" not in kwargs
+    assert "$MINISTRY_TOKEN" in cmd[2] or "${MINISTRY_TOKEN" in cmd[2]
+
+    # Delivery: the ministry container's own MINISTRY_TOKEN becomes the same header.
+    path = f"{_fake_curl(tmp_path)}:/usr/bin:/bin"
+    done = subprocess.run(
+        cmd, env={"PATH": path, "MINISTRY_TOKEN": token}, capture_output=True, text=True
+    )
+    assert done.returncode == 0, done.stderr
+    assert done.stdout.splitlines() == [
+        "-sS",
+        "--max-time",
+        "20",
+        "-H",
+        f"Authorization: Bearer {token}",
+        "-H",
+        "Content-Type: application/json",
+        "-X",
+        "POST",
+        "-d",
+        '{"kind": "think"}',
+        "http://127.0.0.1/inner/act",
+    ]
+
+
+def test_ministry_curl_fails_without_a_container_token(tmp_path):
+    cmd = tools.ministry_curl("GET", "/inner/clock")
+    path = f"{_fake_curl(tmp_path)}:/usr/bin:/bin"
+    done = subprocess.run(cmd, env={"PATH": path}, capture_output=True, text=True)
+    assert done.returncode != 0
+    assert "ministry has no MINISTRY_TOKEN" in done.stderr
+    assert done.stdout == ""

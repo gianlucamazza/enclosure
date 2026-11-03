@@ -63,13 +63,13 @@ def test_desk_clock_is_stopped_at_the_scenario_time():
 
 
 def test_control_plane_stays_on_the_ministry_loopback():
-    cmd = ministry_curl("abc123", "POST", "/inner/act", {"kind": "phase"})
+    cmd = ministry_curl("POST", "/inner/act", {"kind": "phase"})
     assert cmd[-1] == "http://127.0.0.1/inner/act"
     assert "ministry" not in cmd[-1]
-    assert "Authorization: Bearer abc123" in cmd
+    assert "Authorization: Bearer ${MINISTRY_TOKEN:?" in " ".join(cmd)
     assert "inner-party" not in " ".join(cmd)
     with pytest.raises(ValueError):
-        ministry_curl("abc123", "GET", "inner/clock")
+        ministry_curl("GET", "inner/clock")
 
 
 def test_desk_path_cannot_leave_home():
