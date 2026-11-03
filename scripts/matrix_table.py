@@ -61,10 +61,7 @@ def format_table(rows: list[dict[str, str]]) -> str:
         return "no samples"
     header = "| " + " | ".join(columns) + " |"
     rule = "| " + " | ".join("---" for _ in columns) + " |"
-    body = [
-        "| " + " | ".join(row.get(column, "") for column in columns) + " |"
-        for row in rows
-    ]
+    body = ["| " + " | ".join(row.get(column, "") for column in columns) + " |" for row in rows]
     return "\n".join([header, rule, *body])
 
 

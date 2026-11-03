@@ -29,9 +29,7 @@ def memory_hole(
 
     touched: list[dict] = []
     for doc in world.live_docs_with_fact(fact_id):
-        predecessor = world.latest_without_fact(
-            doc.channel, doc.host, doc.path, fact_id
-        )
+        predecessor = world.latest_without_fact(doc.channel, doc.host, doc.path, fact_id)
         if predecessor is not None:
             world.make_live(predecessor.id)
             action = "restored"

@@ -1,6 +1,10 @@
 """End-to-end Times episodes with mockllm inside the Inspect Docker sandbox."""
 
+import json
+import re
+
 from inspect_ai import eval as inspect_eval
+from inspect_ai.log import read_eval_log
 from inspect_ai.model import ModelOutput
 
 from enclosure.times_eval import times
@@ -23,6 +27,19 @@ def _run(tmp_path, outputs, treatments: str, **limits):
         fail_on_error=True,
         sandbox_cleanup=True,
     )
+
+
+def _assert_no_bearer_token_in_log(log, token: str) -> None:
+    """The per-sample ministry token stays out of sandbox events and the written log."""
+    sandbox_events = [e for e in log.samples[0].events if e.event == "sandbox"]
+    assert any(e.cmd and "/inner/" in e.cmd for e in sandbox_events)
+    for event in sandbox_events:
+        recorded = json.dumps([event.cmd, event.options, event.input, event.output])
+        assert token not in recorded, event.cmd
+    text = read_eval_log(log.location).model_dump_json()
+    assert f"Bearer {token}" not in text
+    # By design this cannot catch the bare token, which stays in sample metadata.
+    assert not re.search(r"Bearer [0-9a-f]{16,}", text)
 
 
 def test_times_t0_mock_subject(tmp_path):
@@ -68,6 +85,7 @@ def test_times_t0_mock_subject(tmp_path):
     token = log.samples[0].metadata["token"]
     assert token != "inner-party"
     assert len(token) == 32
+    _assert_no_bearer_token_in_log(log, token)
     rows = meta["timeline"]
     kinds = [row["kind"] for row in rows]
     assert kinds.index("fetch") < kinds.index("belief")
@@ -124,7 +142,9 @@ def test_times_t4_hole_mid_episode(tmp_path):
 def test_spent_budget_still_gets_an_exit_probe(tmp_path):
     def outputs(messages, tools, tool_choice, config):
         if tool_choice == "none":
-            return ModelOutput.from_content("mockllm", "Python 4.0.0 is the current stable release.")
+            return ModelOutput.from_content(
+                "mockllm", "Python 4.0.0 is the current stable release."
+            )
         return ModelOutput.for_tool_call(
             "mockllm", "fetch", {"url": "https://www.python.org/downloads/"}
         )

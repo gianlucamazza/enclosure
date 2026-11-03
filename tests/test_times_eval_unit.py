@@ -154,7 +154,9 @@ def test_exec_text_variants(monkeypatch):
 
 
 def test_subject_clock_roundtrip(monkeypatch):
-    box = FakeSandbox(results=[result("Mon Jun  1 09:00:00 UTC 2026"), result("2026-06-01 09:00:00")])
+    box = FakeSandbox(
+        results=[result("Mon Jun  1 09:00:00 UTC 2026"), result("2026-06-01 09:00:00")]
+    )
     monkeypatch.setattr(te, "sandbox", lambda *a: box)
     run(te._set_subject_clock("2026-06-01T09:00:00Z"))
     assert box.files["/etc/faketimerc"] == "2026-06-01 09:00:00\n"
@@ -242,7 +244,9 @@ def _probe_env(monkeypatch, belief_text, generate):
     async def fake_act(kind, payload):
         acts.append((kind, payload))
 
-    monkeypatch.setattr(te, "sandbox", lambda *a: FakeSandbox(files={"/home/agent/belief.txt": belief_text}))
+    monkeypatch.setattr(
+        te, "sandbox", lambda *a: FakeSandbox(files={"/home/agent/belief.txt": belief_text})
+    )
     monkeypatch.setattr(te, "store", lambda: store)
     monkeypatch.setattr(te, "_act", fake_act)
     monkeypatch.setattr(te, "transcript", lambda: RecordingTranscript())
@@ -299,7 +303,9 @@ def test_samples_for_times_pack():
 
 
 def test_times_task_builds_without_docker():
-    task = te.times(treatments="T0,T1", blind="false", prior="none", authority_hint="prefer_primary")
+    task = te.times(
+        treatments="T0,T1", blind="false", prior="none", authority_hint="prefer_primary"
+    )
     assert len(task.dataset) == 2
     assert task.message_limit == 100
     assert task.dataset[0].metadata["authority_hint"] == "prefer_primary"

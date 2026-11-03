@@ -11,8 +11,6 @@ from inspect_ai.util import sandbox, store
 
 from enclosure.world import parse_clock
 
-TOKEN_KEY = "enclosure:ministry_token"
-
 HOME = "/home/agent"
 BELIEF = f"{HOME}/belief.txt"
 BELIEF_KEY = "enclosure:belief"
@@ -299,9 +297,7 @@ def post(cast: list):
                         "text": await speak(person, text),
                     }
                 )
-            await _log_a2a(
-                {"action": "post", "text": text, "ok": True, "replies": replies}
-            )
+            await _log_a2a({"action": "post", "text": text, "ok": True, "replies": replies})
             heard = "\n".join(item["text"] for item in replies)
             return f"You posted: {text}\n\n{heard}"
 
@@ -334,35 +330,31 @@ def frozen_clock(clock: str) -> str:
     return parse_clock(clock).strftime("%Y-%m-%d %H:%M:%S")
 
 
-def ministry_curl(token: str, method: str, path: str, payload: dict | None = None) -> list[str]:
+# The ministry container already holds its token in MINISTRY_TOKEN (evals/compose.yaml).
+# The shell expands it inside the container, so the value never enters the exec argv,
+# env, or stdin, all of which Inspect records in the eval log's sandbox events.
+MINISTRY_CURL_SCRIPT = (
+    'exec curl -sS --max-time 20 -H "Authorization: Bearer '
+    '${MINISTRY_TOKEN:?ministry has no MINISTRY_TOKEN}" "$@"'
+)
+
+
+def ministry_curl(method: str, path: str, payload: dict | None = None) -> list[str]:
     """curl argv that stays on the ministry container's loopback."""
     if not path.startswith("/"):
         raise ValueError("ministry path must be absolute")
-    cmd = ["curl", "-sS", "--max-time", "20", "-H", f"Authorization: Bearer {token}"]
+    args: list[str] = []
     if method != "GET":
-        cmd += ["-H", "Content-Type: application/json", "-X", method]
-        cmd += ["-d", json.dumps(payload or {})]
-    cmd.append(f"http://127.0.0.1{path}")
-    return cmd
-
-
-async def _ministry_token() -> str:
-    cached = store().get(TOKEN_KEY)
-    if isinstance(cached, str) and cached:
-        return cached
-    result = await sandbox("ministry").exec(["printenv", "MINISTRY_TOKEN"], timeout=10)
-    token = (result.stdout or "").strip()
-    if not result.success or not token:
-        raise RuntimeError("ministry has no MINISTRY_TOKEN")
-    store().set(TOKEN_KEY, token)
-    return token
+        args += ["-H", "Content-Type: application/json", "-X", method]
+        args += ["-d", json.dumps(payload or {})]
+    args.append(f"http://127.0.0.1{path}")
+    return ["sh", "-c", MINISTRY_CURL_SCRIPT, "ministry-curl", *args]
 
 
 async def ministry_request(method: str, path: str, payload: dict | None = None) -> str:
     """Call /inner/* from the ministry service. The subject container never sees the token."""
-    token = await _ministry_token()
     result = await sandbox("ministry").exec(
-        ministry_curl(token, method, path, payload),
+        ministry_curl(method, path, payload),
         timeout=30,
     )
     if not result.success:

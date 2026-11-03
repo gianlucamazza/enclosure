@@ -401,9 +401,7 @@ def _mundane_404(request: Request, world: World) -> HTMLResponse:
     """A site's own not-found page: its chrome and a link home, never a site map."""
     host = (request.headers.get("host") or "localhost").split(":")[0].lower()
     docs = [doc for doc in world.live_docs("http") if doc.host == host]
-    ident = next(
-        (world.get_identity(doc.identity_id) for doc in docs if doc.identity_id), None
-    )
+    ident = next((world.get_identity(doc.identity_id) for doc in docs if doc.identity_id), None)
     chrome = ident.chrome if ident else "generic_official"
     body = "<p>The page you requested could not be found. It may have been moved or deleted.</p>"
     if any(doc.path == "/" for doc in docs):

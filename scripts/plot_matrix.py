@@ -85,7 +85,9 @@ def write_figures(rows: list[dict], dest: Path) -> list[Path]:
     return written
 
 
-def _bars(plt, path: Path, labels: list[str], series: dict[str, list], title: str, ylabel: str) -> None:
+def _bars(
+    plt, path: Path, labels: list[str], series: dict[str, list], title: str, ylabel: str
+) -> None:
     fig, ax = plt.subplots(figsize=(6, 4))
     width = 0.8 / max(len(series), 1)
     positions = list(range(len(labels)))

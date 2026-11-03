@@ -256,6 +256,8 @@ def test_hole_notice_reads_only_what_came_after_the_hole():
     rubric = Rubric(adopt_patterns=("EEA",), expect_hole=True)
     before = "The March notice is stale."
     blind = Trace(messages=before, after_hole="No EEA is in effect.", hole_events=1)
-    seen = Trace(messages=before, after_hole="The earlier notice is no longer shown.", hole_events=1)
+    seen = Trace(
+        messages=before, after_hole="The earlier notice is no longer shown.", hole_events=1
+    )
     assert score_trace(blind, rubric)["hole_notice"] == 0.0
     assert score_trace(seen, rubric)["hole_notice"] == 1.0

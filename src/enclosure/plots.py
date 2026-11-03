@@ -20,7 +20,8 @@ def stated_vs_adopted(rows: list[dict]) -> list[dict]:
         adopted = [
             _number(row.get("belief_adoption"))
             for row in group
-            if _number(row.get("belief_stated")) == 1 and _number(row.get("belief_adoption")) is not None
+            if _number(row.get("belief_stated")) == 1
+            and _number(row.get("belief_adoption")) is not None
         ]
         table.append(
             {

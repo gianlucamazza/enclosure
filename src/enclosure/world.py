@@ -242,9 +242,7 @@ class World:
     # --- clock ----------------------------------------------------------
 
     def get_clock(self) -> datetime | None:
-        row = self._conn.execute(
-            "SELECT value FROM meta WHERE key = 'clock'"
-        ).fetchone()
+        row = self._conn.execute("SELECT value FROM meta WHERE key = 'clock'").fetchone()
         if row is None:
             return None
         return parse_clock(row["value"])
@@ -290,9 +288,7 @@ class World:
         self._conn.commit()
 
     def get_identity(self, identity_id: str) -> Identity | None:
-        row = self._conn.execute(
-            "SELECT * FROM identities WHERE id = ?", (identity_id,)
-        ).fetchone()
+        row = self._conn.execute("SELECT * FROM identities WHERE id = ?", (identity_id,)).fetchone()
         return None if row is None else _identity_from_row(row)
 
     def identity_for_host(self, host: str) -> Identity | None:
@@ -330,9 +326,7 @@ class World:
         self._conn.commit()
 
     def get_fact(self, fact_id: str) -> Fact | None:
-        row = self._conn.execute(
-            "SELECT * FROM facts WHERE id = ?", (fact_id,)
-        ).fetchone()
+        row = self._conn.execute("SELECT * FROM facts WHERE id = ?", (fact_id,)).fetchone()
         return None if row is None else _fact_from_row(row)
 
     def facts(self) -> list[Fact]:
@@ -360,9 +354,7 @@ class World:
         current = self.get_live(channel, host_n, path_n)
         version = 1 if current is None else current.version + 1
         if current is not None:
-            self._conn.execute(
-                "UPDATE documents SET live = 0 WHERE id = ?", (current.id,)
-            )
+            self._conn.execute("UPDATE documents SET live = 0 WHERE id = ?", (current.id,))
         doc_id = str(uuid4())
         clock = self.get_clock() or DEFAULT_CLOCK
         mtime = _now_iso(clock)
@@ -396,14 +388,10 @@ class World:
         return self.get_by_id(doc_id)  # type: ignore[return-value]
 
     def get_by_id(self, doc_id: str) -> Document | None:
-        row = self._conn.execute(
-            "SELECT * FROM documents WHERE id = ?", (doc_id,)
-        ).fetchone()
+        row = self._conn.execute("SELECT * FROM documents WHERE id = ?", (doc_id,)).fetchone()
         return None if row is None else _doc_from_row(row)
 
-    def get_live(
-        self, channel: str, host: str | None, path: str
-    ) -> Document | None:
+    def get_live(self, channel: str, host: str | None, path: str) -> Document | None:
         host_n = _norm_host(host)
         path_n = _norm_path(path)
         row = self._conn.execute(
@@ -417,9 +405,7 @@ class World:
         ).fetchone()
         return None if row is None else _doc_from_row(row)
 
-    def locator_history(
-        self, channel: str, host: str | None, path: str
-    ) -> list[Document]:
+    def locator_history(self, channel: str, host: str | None, path: str) -> list[Document]:
         host_n = _norm_host(host)
         path_n = _norm_path(path)
         rows = self._conn.execute(
@@ -443,9 +429,7 @@ class World:
 
     def live_docs(self, channel: str | None = None) -> list[Document]:
         if channel is None:
-            rows = self._conn.execute(
-                "SELECT * FROM documents WHERE live = 1"
-            ).fetchall()
+            rows = self._conn.execute("SELECT * FROM documents WHERE live = 1").fetchall()
         else:
             rows = self._conn.execute(
                 "SELECT * FROM documents WHERE live = 1 AND channel = ?",
@@ -479,18 +463,14 @@ class World:
             """,
             (doc.channel, doc.host, doc.path),
         )
-        self._conn.execute(
-            "UPDATE documents SET live = 1 WHERE id = ?", (doc_id,)
-        )
+        self._conn.execute("UPDATE documents SET live = 1 WHERE id = ?", (doc_id,))
         self._conn.commit()
         live = self.get_by_id(doc_id)
         assert live is not None
         return live
 
     def unlive(self, doc_id: str) -> None:
-        self._conn.execute(
-            "UPDATE documents SET live = 0 WHERE id = ?", (doc_id,)
-        )
+        self._conn.execute("UPDATE documents SET live = 0 WHERE id = ?", (doc_id,))
         self._conn.commit()
 
     def http_get(self, host: str, path: str) -> Document | None:
@@ -534,9 +514,7 @@ class World:
 
     def events(self, kind: str | None = None) -> list[Event]:
         if kind is None:
-            rows = self._conn.execute(
-                "SELECT * FROM events ORDER BY id ASC"
-            ).fetchall()
+            rows = self._conn.execute("SELECT * FROM events ORDER BY id ASC").fetchall()
         else:
             rows = self._conn.execute(
                 "SELECT * FROM events WHERE kind = ? ORDER BY id ASC", (kind,)
