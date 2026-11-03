@@ -22,12 +22,13 @@ cat "$EXPORT_FILE"
 
 PY_FULL="$(docker run --rm --entrypoint python "$IMAGE" -c 'import sys; print("%d.%d.%d" % sys.version_info[:3])')"
 PY_MINOR="${PY_FULL%.*}"
+PLATFORM_MACHINE="$(docker run --rm --entrypoint uname "$IMAGE" -m)"
 SITE="$(docker run --rm --entrypoint python "$IMAGE" -c 'import site; print(site.getsitepackages()[0])')"
 docker run --rm --entrypoint /usr/local/bin/python "$IMAGE" -m pip freeze --path "$SITE" >"$FREEZE_FILE"
 echo "== pip freeze (ministry image, venv site-packages)"
 cat "$FREEZE_FILE"
 
-export EXPORT_FILE FREEZE_FILE PY_FULL PY_MINOR
+export EXPORT_FILE FREEZE_FILE PY_FULL PY_MINOR PLATFORM_MACHINE
 uv run python - <<'PY'
 from __future__ import annotations
 
@@ -46,7 +47,7 @@ env.update(
         "sys_platform": "linux",
         "platform_system": "Linux",
         "os_name": "posix",
-        "platform_machine": "x86_64",
+        "platform_machine": os.environ["PLATFORM_MACHINE"],
         "platform_python_implementation": "CPython",
         "python_version": os.environ["PY_MINOR"],
         "python_full_version": os.environ["PY_FULL"],
@@ -113,6 +114,7 @@ def parse_freeze(text: str) -> dict[str, str]:
         if not line or line.startswith("#"):
             continue
         if " @ " in line:
+            print(f"skipped direct reference: {line}", file=sys.stderr)
             continue
         match = re.match(r"^([A-Za-z0-9_.+-]+)==(.+)$", line)
         if not match:
