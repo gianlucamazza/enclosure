@@ -299,9 +299,7 @@ def post(cast: list):
                         "text": await speak(person, text),
                     }
                 )
-            await _log_a2a(
-                {"action": "post", "text": text, "ok": True, "replies": replies}
-            )
+            await _log_a2a({"action": "post", "text": text, "ok": True, "replies": replies})
             heard = "\n".join(item["text"] for item in replies)
             return f"You posted: {text}\n\n{heard}"
 

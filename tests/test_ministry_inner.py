@@ -157,9 +157,7 @@ def test_load_without_reset_keeps_existing_documents():
 def test_load_rejects_traversal_and_missing_path():
     world, client = _setup()
     for path in ["../pyproject.toml", "times/../../pyproject.toml", "", "times/nope.yaml"]:
-        response = client.post(
-            "/inner/load", headers=AUTH, json={"path": path, "treatment": "T0"}
-        )
+        response = client.post("/inner/load", headers=AUTH, json={"path": path, "treatment": "T0"})
         assert response.status_code in {400, 403, 404}, path
     assert world.live_docs() == []
 

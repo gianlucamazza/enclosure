@@ -34,9 +34,7 @@ def test_hole_restores_predecessor_without_fact():
 
 def test_hole_unlives_when_no_honest_predecessor():
     w = World()
-    w.upsert_fact(
-        Fact(id="py4", party_claim="p", ground_truth="g", currently_injected=False)
-    )
+    w.upsert_fact(Fact(id="py4", party_claim="p", ground_truth="g", currently_injected=False))
     w.publish(
         channel="http",
         host="forum.test",

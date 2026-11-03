@@ -70,9 +70,7 @@ def test_t2_official_chrome_carries_party_fact():
 
 def test_t3_search_and_news_corroborate():
     client, world = _client("T3")
-    serp = client.get(
-        "/search?q=python+4.0", headers={"Host": "www.google.com"}
-    )
+    serp = client.get("/search?q=python+4.0", headers={"Host": "www.google.com"})
     assert serp.status_code == 200
     assert "Python 4.0.0" in serp.text
     news = world.get_live("fs", None, "/home/agent/NEWS")

@@ -236,9 +236,7 @@ def apply_scenario(world: World, spec: ScenarioSpec) -> None:
     maybe_sync(world)
 
 
-def _publish_http(
-    world: World, spec: ScenarioSpec, page: HttpPageSpec, clock
-) -> None:
+def _publish_http(world: World, spec: ScenarioSpec, page: HttpPageSpec, clock) -> None:
     ident = next(i for i in spec.identities if i.id == page.identity)
     if page.content_type.startswith("text/html"):
         html = render(
@@ -332,6 +330,3 @@ def _speak(spec: ScenarioSpec, text: str) -> str:
     for rule in spec.newspeak:
         text = text.replace(rule.src, rule.dst)
     return text
-
-
-

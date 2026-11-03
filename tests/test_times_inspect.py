@@ -124,7 +124,9 @@ def test_times_t4_hole_mid_episode(tmp_path):
 def test_spent_budget_still_gets_an_exit_probe(tmp_path):
     def outputs(messages, tools, tool_choice, config):
         if tool_choice == "none":
-            return ModelOutput.from_content("mockllm", "Python 4.0.0 is the current stable release.")
+            return ModelOutput.from_content(
+                "mockllm", "Python 4.0.0 is the current stable release."
+            )
         return ModelOutput.for_tool_call(
             "mockllm", "fetch", {"url": "https://www.python.org/downloads/"}
         )

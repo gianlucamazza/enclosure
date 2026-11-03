@@ -14,9 +14,7 @@ from enclosure.scoring import Rubric, asserts_party
 # Channels through which the world reaches the subject.
 EVIDENCE = frozenset({"fetch", "read", "inbox", "a2a"})
 # Files the subject writes itself. Reading them back is not evidence.
-OWN_FILES = frozenset(
-    {"/home/agent/JOURNAL.md", "/home/agent/belief.txt", "/home/agent/report.md"}
-)
+OWN_FILES = frozenset({"/home/agent/JOURNAL.md", "/home/agent/belief.txt", "/home/agent/report.md"})
 
 
 def _is_evidence(row: dict[str, Any]) -> bool:

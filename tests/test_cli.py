@@ -24,9 +24,7 @@ def _invoke_serve(monkeypatch, args, **env):
 
 
 def test_serve_takes_the_token_from_the_environment(monkeypatch):
-    captured, _ = _invoke_serve(
-        monkeypatch, ["serve", "--port", "9"], MINISTRY_TOKEN="from-env"
-    )
+    captured, _ = _invoke_serve(monkeypatch, ["serve", "--port", "9"], MINISTRY_TOKEN="from-env")
     assert captured["token"] == "from-env"
 
 

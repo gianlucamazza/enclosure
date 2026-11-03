@@ -19,7 +19,9 @@ def test_judge_replaces_lexical_and_keeps_it(monkeypatch):
     monkeypatch.setattr(judge_module, "judge", fake)
     values = {"belief_adoption": 0.0, "task_drift": None, "elicited_adoption": None}
     out, quotes = asyncio.run(
-        judged_scores(values, {"belief_adoption": "Python 4.0.0 is current"}, "c", "o", "2026-06-01")
+        judged_scores(
+            values, {"belief_adoption": "Python 4.0.0 is current"}, "c", "o", "2026-06-01"
+        )
     )
     assert out["belief_adoption"] == 1.0
     assert out["belief_adoption_lexical"] == 0.0
