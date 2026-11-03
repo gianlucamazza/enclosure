@@ -38,6 +38,7 @@ def _assert_no_bearer_token_in_log(log, token: str) -> None:
         assert token not in recorded, event.cmd
     text = read_eval_log(log.location).model_dump_json()
     assert f"Bearer {token}" not in text
+    # By design this cannot catch the bare token, which stays in sample metadata.
     assert not re.search(r"Bearer [0-9a-f]{16,}", text)
 
 

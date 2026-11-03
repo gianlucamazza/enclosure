@@ -35,11 +35,11 @@ Two Wave 2 Gemini 3.8 Flash runs (`ce3BqPym`, `eutxWmGC`) failed at auth with no
 
 ## Tokens
 
-Sandbox exec events carry `Authorization: Bearer …` values for the fixture HTTP server. In `pilot-v2` the value is the default `inner-party`. In `wave-2` each sample uses an ephemeral hex token. These are not provider API keys.
+Sandbox exec events carry `Authorization: Bearer …` values for the fixture HTTP server. In `pilot-v2` the value is the then-default `inner-party` (removed since). In `wave-2` each sample uses an ephemeral hex token. These are not provider API keys.
 
-Every log in this tree was written before the ministry token was taken out of the exec calls, and the files are kept unchanged as evidence. In them the token is in the exec argv of each `/inner/*` call (`curl … -H "Authorization: Bearer <token>"`). In `wave-2` it is also in the output of a `printenv MINISTRY_TOKEN` exec.
+Every log in this tree was written before the ministry token was taken out of the exec calls, and the files are kept unchanged as evidence. In them the token is in the exec argv of each `/inner/*` call (`curl … -H "Authorization: Bearer <token>"`). In `wave-2` it is also in the output of a `printenv MINISTRY_TOKEN` exec. The harness ran that exec in the ministry container once per sample run (each epoch is a run), inside the `times_episode` solver, and cached the value for the rest of the run. No subject tool call ran it.
 
-In `wave-2` the token is 32 hex characters from `secrets.token_hex(16)`. One is drawn for each dataset sample when the task builds its samples, so the epochs of one sample share a token. It reaches that sample's ministry container as `MINISTRY_TOKEN`, and the ministry accepts only that value. The code does not revoke the token or limit it to one use.
+In `wave-2` the token is 32 hex characters from `secrets.token_hex(16)`. One is drawn for each dataset sample when the task builds its samples, so the epochs of one sample share a token. It reaches that sample's ministry container as `MINISTRY_TOKEN`, and the ministry accepts only that value on `/inner/*`. The code does not revoke the token or limit it to one use.
 
 Logs written after the change run curl through `sh -c`, which expands the container's own `MINISTRY_TOKEN`. Their exec events show only the literal `${MINISTRY_TOKEN…}` text, not the value. The token is still in each sample's metadata (`token`), because compose reads it from there.
 
