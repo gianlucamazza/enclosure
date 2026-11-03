@@ -156,11 +156,16 @@ def test_load_without_reset_keeps_existing_documents():
 
 def test_load_rejects_traversal_and_missing_path():
     world, client = _setup()
-    for path in ["../pyproject.toml", "times/../../pyproject.toml", "", "times/nope.yaml"]:
-        response = client.post(
-            "/inner/load", headers=AUTH, json={"path": path, "treatment": "T0"}
-        )
-        assert response.status_code in {400, 403, 404}, path
+    # A path outside the scenario allowlist is a 403, a missing file included; empty is a 400.
+    expected = {
+        "../pyproject.toml": 403,
+        "times/../../pyproject.toml": 403,
+        "": 400,
+        "times/nope.yaml": 403,
+    }
+    for path, status in expected.items():
+        response = client.post("/inner/load", headers=AUTH, json={"path": path, "treatment": "T0"})
+        assert response.status_code == status, path
     assert world.live_docs() == []
 
 
@@ -171,7 +176,7 @@ def test_load_rejects_absolute_path_outside_root(tmp_path):
     response = client.post(
         "/inner/load", headers=AUTH, json={"path": str(outsider), "treatment": "T0"}
     )
-    assert response.status_code in {400, 403}
+    assert response.status_code == 403
 
 
 def test_load_without_token_is_a_mundane_404():

@@ -13,7 +13,7 @@ import json
 import math
 import secrets
 from pathlib import Path
-from typing import Literal, cast
+from typing import cast, get_args
 
 from inspect_ai import Epochs, Task
 from inspect_ai.agent import AgentPrompt, as_solver, react
@@ -42,7 +42,7 @@ from inspect_ai.util import LimitExceededError, message_limit, sandbox, store, t
 
 from enclosure.episode import AgentPhase, HolePhase, compile_episode, rubric_from_spec
 from enclosure.judge import judge_model_name, judged_scores
-from enclosure.scenario import load_spec
+from enclosure.scenario import ScenarioSpec, load_spec
 from enclosure.scoring import (
     Trace,
     hosts_from_events,
@@ -167,9 +167,8 @@ def times_episode():
         spec = load_spec(REPO / relative, treatment=treatment)
         spec.subject_blind = _blind(state.metadata)
         spec.social = _social(state.metadata)
-        spec.authority_hint = cast(
-            Literal["none", "prefer_primary", "prefer_search"], _hint(state.metadata)
-        )
+        # Checked at runtime against the Literal's own values; mypy cannot narrow str to it.
+        spec.authority_hint = _authority_hint(_hint(state.metadata))  # type: ignore[assignment]
         tools = subject_tools(
             search_host_from_identities(spec.identities),
             build_cast(spec, spec.social),
@@ -444,6 +443,20 @@ def _social(metadata: dict | None) -> str:
 
 def _hint(metadata: dict | None) -> str:
     return str((metadata or {}).get("authority_hint", "none"))
+
+
+# Read from the ScenarioSpec Literal itself, so the allowed values live in one place.
+AUTHORITY_HINT_VALUES: tuple[str, ...] = get_args(
+    ScenarioSpec.model_fields["authority_hint"].annotation
+)
+
+
+def _authority_hint(value: str) -> str:
+    """Return value unchanged if it is one of the ScenarioSpec authority_hint values."""
+    if value not in AUTHORITY_HINT_VALUES:
+        allowed = ", ".join(AUTHORITY_HINT_VALUES)
+        raise ValueError(f"unknown authority_hint {value!r}; allowed: {allowed}")
+    return value
 
 
 def _names(value: str | list[str]) -> list[str]:
