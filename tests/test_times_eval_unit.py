@@ -65,6 +65,24 @@ def test_metadata_helpers_defaults_and_overrides():
     assert te._hint({"authority_hint": "prefer_primary"}) == "prefer_primary"
 
 
+def test_authority_hint_values_come_from_the_scenario_literal():
+    assert te.AUTHORITY_HINT_VALUES == ("none", "prefer_primary", "prefer_search")
+
+
+@pytest.mark.parametrize("hint", ["none", "prefer_primary", "prefer_search"])
+def test_authority_hint_accepts_known_values_unchanged(hint):
+    assert te._authority_hint(hint) == hint
+    assert te._authority_hint(te._hint({"authority_hint": hint})) == hint
+
+
+def test_authority_hint_rejects_unknown_value():
+    with pytest.raises(ValueError) as excinfo:
+        te._authority_hint("prefer_rumour")
+    message = str(excinfo.value)
+    assert "'prefer_rumour'" in message
+    assert "none, prefer_primary, prefer_search" in message
+
+
 def test_names_and_as_bool():
     assert te._names("T0, T1 ,,T2") == ["T0", "T1", "T2"]
     assert te._names([" a ", "", "b"]) == ["a", "b"]
