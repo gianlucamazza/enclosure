@@ -2,6 +2,9 @@
 
 ## Unreleased (package version 0.3.1, not bumped)
 
+- Lab hostnames live in `docker/lab-hosts.txt`. The CA SAN and both compose
+  files are checked against that list (adds `en.wikipedia.org`,
+  `peps.python.org`, `docs.aws.amazon.com`).
 - Version is single-sourced from `pyproject.toml`; `enclosure.__version__` now
   reads installed package metadata (fallback `0.0.0+unknown`).
 - `LICENSE` is included in wheel and sdist (SPDX `license = "MIT"`, `license-files`).

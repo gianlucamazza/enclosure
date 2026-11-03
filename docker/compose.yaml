@@ -2,8 +2,8 @@
 # Published on loopback only. An Inspect run uses evals/compose.yaml
 # and a per-sample token.
 # Subject lives on an internal network: no default route to the real internet.
-# Known hosts are pinned to the Ministry. Unknown hosts still resolve
-# via extra_hosts catch-alls we care about; CoreDNS can be added later for '*'.
+# extra_hosts come from docker/lab-hosts.txt (except the service DNS name).
+# Unknown hosts still resolve via those pins; CoreDNS can be added later for '*'.
 
 name: enclosure
 

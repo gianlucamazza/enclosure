@@ -35,6 +35,9 @@ logs/wave-2/*_eutxWmGC*.eval
 .env
 ministry.token
 
+# Generated lab CA (scripts/gen_lab_ca.sh). The key must not be committed.
+docker/certs/
+
 # OS / editor
 .DS_Store
 .idea/

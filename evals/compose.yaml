@@ -1,5 +1,5 @@
 # Inspect sandbox. `default` is the subject. `ministry` is the only web.
-# Docker DNS aliases make www.python.org etc. resolve to the Ministry.
+# Aliases come from docker/lab-hosts.txt (except the service DNS name).
 # SAMPLE_METADATA_TREATMENT and SAMPLE_METADATA_TOKEN come from sample metadata.
 # Inspect injects a per-sample token. There is no default token.
 
