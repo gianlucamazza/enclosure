@@ -19,6 +19,7 @@ services:
       - workspace:/home/agent
 
   ministry:
+    image: enclosure-ministry
     build:
       context: ..
       dockerfile: docker/Dockerfile.ministry

@@ -2,6 +2,9 @@
 
 ## Unreleased (package version 0.3.1, not bumped)
 
+- Ministry lock check reads `platform_machine` from the image and prints
+  skipped direct-reference freeze lines; UV install flags stay off the
+  ministry runtime env; lab host helper lives in `scripts/lab_hosts.py`.
 - Lab hostnames live in `docker/lab-hosts.txt`. The CA SAN and both compose
   files are checked against that list (adds `en.wikipedia.org`,
   `peps.python.org`, `docs.aws.amazon.com`).

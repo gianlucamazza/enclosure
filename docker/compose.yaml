@@ -9,6 +9,7 @@ name: enclosure
 
 services:
   ministry:
+    image: enclosure-ministry
     build:
       context: ..
       dockerfile: docker/Dockerfile.ministry

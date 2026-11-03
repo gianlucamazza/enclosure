@@ -2,14 +2,21 @@
 
 from __future__ import annotations
 
+import importlib.util
 import subprocess
 from pathlib import Path
 
 import yaml
 
-from enclosure.lab_hosts import load_lab_hosts, san_extension
-
 ROOT = Path(__file__).resolve().parents[1]
+_path = ROOT / "scripts" / "lab_hosts.py"
+_spec = importlib.util.spec_from_file_location("lab_hosts", _path)
+_mod = importlib.util.module_from_spec(_spec)
+assert _spec.loader is not None
+_spec.loader.exec_module(_mod)
+load_lab_hosts = _mod.load_lab_hosts
+san_extension = _mod.san_extension
+
 COMPOSE_FILES = ("evals/compose.yaml", "docker/compose.yaml")
 COMPOSE_SERVICE_DNS = "ministry"
 REQUIRED_HOSTS = ("en.wikipedia.org", "peps.python.org", "docs.aws.amazon.com")
@@ -75,7 +82,7 @@ def test_san_extension_formats_dns_entries():
 
 def test_lab_hosts_script_prints_san_extension():
     output = subprocess.check_output(
-        ["python3", str(ROOT / "src" / "enclosure" / "lab_hosts.py")],
+        ["python3", str(ROOT / "scripts" / "lab_hosts.py")],
         text=True,
     )
     assert output.strip() == san_extension()

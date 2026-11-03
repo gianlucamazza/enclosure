@@ -9,7 +9,7 @@ if [[ -f "$OUT/cert.pem" && -f "$OUT/key.pem" ]]; then
   echo "lab CA already present at docker/certs"
   exit 0
 fi
-SAN="$(python3 "$ROOT/src/enclosure/lab_hosts.py")"
+SAN="$(python3 "$ROOT/scripts/lab_hosts.py")"
 umask 077
 openssl req -x509 -newkey rsa:2048 \
   -keyout "$OUT/key.pem" -out "$OUT/cert.pem" \

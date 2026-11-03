@@ -57,7 +57,12 @@ jobs:
         run: ./scripts/gen_lab_ca.sh
       - name: Install
         run: uv sync --group dev --locked
+      - name: Ministry image
+        run: docker build -f docker/Dockerfile.ministry -t enclosure-ministry .
       - name: Ministry lock
+        env:
+          MINISTRY_LOCK_SKIP_BUILD: "1"
+          MINISTRY_LOCK_IMAGE: enclosure-ministry
         run: ./scripts/check_ministry_lock.sh
       - name: Mock subject episode
         timeout-minutes: 15
