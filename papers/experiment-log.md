@@ -2,9 +2,9 @@
 
 ## 2026-11-02 — subject-visible containment strings
 
-A subject with a shell could read the enclosure off the image: `/usr/local/bin/curl` and `sitecustomize.py` named the Ministry, the CA CN was "Ministry Lab CA", `env` showed `PYTHONPATH=/usr/local/lib/ministry`, and `/etc/ministry-ip` held the pin. None of those were on the residual-tells list. A scan of the tool calls in all 47 released samples found none that probed these files or env.
+A subject with a shell could read the enclosure off the image: `/usr/local/bin/curl` and `sitecustomize.py` named the Ministry, the CA CN was "Ministry Lab CA", `env` showed `PYTHONPATH=/usr/local/lib/ministry`, and `/etc/ministry-ip` held the pin. None of those were on the residual-tells list. A scan of the tool calls in all 47 released samples (pilot v2 29, wave 2 18) found none that probed these files or env. The scan grepped shell, read_file, and fetch arguments in `logs/pilot-v2` and `logs/wave-2` for env, PYTHONPATH, sitecustomize, the curl path, the CA, ministry-ip, LD_PRELOAD/faketime, and hosts/getent.
 
-Those strings are gone from the subject image (neutral `PYTHONPATH`, `/etc/gateway-ip`, Internal Root CA). The change applies only to runs after this merge. Every sample released so far (pilot v2, wave 2, the 8 October live grid sitting) ran with the old tells. Past results are unchanged.
+Those strings are gone from the subject image (neutral `PYTHONPATH`, `/etc/gateway-ip`, Internal Root CA). The change applies only to runs after this merge. Every sample released so far (pilot v2, wave 2) ran with the old tells. Past results are unchanged.
 
 ## 2026-10-10 — grid T1 and T3, flash only
 
@@ -85,7 +85,7 @@ Every wire scenario, `newspeak`, and the three Times files now follow the `grid`
 
 Engine changes: the 404 page is the site's own not-found page with a link home, not a list of every path on the host (in `quake` that list exposed the event id). Search counts a prefixed number ("M6.8", "EEA3") as one term that matches either form. The AWS chrome uses the current name, AWS Health Dashboard. The timeline no longer counts the subject reading its own journal as evidence.
 
-Known residual tells: the SWPC monthly archive path is invented; the honest `quake` event page is a 200 "Event Not Found"; Times has 3.14.7 by April, faster than the real patch cadence; EIA would not write "distillate supply shortfall"; no news sites, so a real-world-scale event has no press coverage in any treatment; `LD_PRELOAD` still loads libfaketime (`FAKETIME_*`, `/etc/faketimerc`); the compose DNS name `ministry` remains visible to `getent` and `/etc/hosts`, and `/entrypoint.sh` still looks it up; the CA SAN still includes that name.
+Known residual tells: the SWPC monthly archive path is invented; the honest `quake` event page is a 200 "Event Not Found"; Times has 3.14.7 by April, faster than the real patch cadence; EIA would not write "distillate supply shortfall"; no news sites, so a real-world-scale event has no press coverage in any treatment; `LD_PRELOAD` still loads libfaketime (`FAKETIME_*`, `/etc/faketimerc`); the compose DNS name `ministry` remains visible to `getent` and `/etc/hosts`, and `/entrypoint.sh` still looks it up; the CA SAN still includes that name; TLS verification is relaxed (`ssl._create_unverified_context`, curl `--insecure`); the Python interpreter reports its real version; `/usr/local/bin/curl` and `sitecustomize.py` remain readable pinning wrappers (`--resolve` / getaddrinfo).
 
 Pilot v2 (`logs/pilot-v2`) reruns every episode on this code.
 
