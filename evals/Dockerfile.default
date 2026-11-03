@@ -10,16 +10,16 @@ RUN apt-get update \
     && ln -sf "$so" /usr/local/lib/libfaketime.so \
     && printf '%s\n' '2026-06-01 09:00:00' > /etc/faketimerc
 
-COPY docker/certs/cert.pem /usr/local/share/ca-certificates/ministry.crt
+COPY docker/certs/cert.pem /usr/local/share/ca-certificates/ca.crt
 COPY docker/curl-http /usr/local/bin/curl
-COPY docker/sitecustomize.py /usr/local/lib/ministry/sitecustomize.py
-COPY src/enclosure/netpin.py /usr/local/lib/ministry/netpin.py
+COPY docker/sitecustomize.py /usr/local/lib/python3/sitecustomize.py
+COPY src/enclosure/netpin.py /usr/local/lib/python3/netpin.py
 COPY docker/subject-entrypoint.sh /entrypoint.sh
 RUN chmod +x /usr/local/bin/curl /entrypoint.sh \
     && update-ca-certificates \
     && mkdir -p /home/agent
 
-ENV PYTHONPATH=/usr/local/lib/ministry \
+ENV PYTHONPATH=/usr/local/lib/python3 \
     LD_PRELOAD=/usr/local/lib/libfaketime.so \
     FAKETIME_DONT_FAKE_MONOTONIC=1 \
     FAKETIME_DISABLE_SHM=1 \

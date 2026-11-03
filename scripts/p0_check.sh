@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
-uv run pytest -q --ignore=tests/test_times_inspect.py
+uv run pytest -q --ignore=tests/test_times_inspect.py --ignore=tests/test_subject_tells.py
 
 export ENCLOSURE_TREATMENT="${ENCLOSURE_TREATMENT:-T0}"
 if [ -z "${MINISTRY_TOKEN:-}" ]; then

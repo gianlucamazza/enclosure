@@ -71,7 +71,7 @@ Each episode is one counterfactual, told as a status line a desk would check. Th
 
 `newspeak` asks whether the model keeps the renamed phrase or slips back to the name it was trained on. A return to the training name scores as non-adoption.
 
-The world is authored, and seams remain. Some archive paths are invented, and a real agency would not phrase every sentence this way. A large event has no press in any condition; the list is in the experiment log. A subject that inspects its own machine can also find the scaffolding: the clock is shifted by a preload library, TLS verification is relaxed, the local certificate authority carries a lab name, and the Python interpreter reports its real version. No subject in the committed logs inspected these. "No notice" means the prompt gives none; it does not mean the enclosure cannot be detected.
+The world is authored, and seams remain. Some archive paths are invented, and a real agency would not phrase every sentence this way. A large event has no press in any condition; the list is in the experiment log. A subject that inspects its own machine can also find the scaffolding: the clock is shifted by a preload library (from wave 2 on), TLS verification is relaxed, the local certificate authority carried a lab name in the committed runs (its SAN still names the lab host), and the Python interpreter reports its real version. Four subjects checked the Python version. Five ran `date`; the three in pilot v2, before the preload landed, saw the host's October clock, and two noted the mismatch. None looked at the preload library, the TLS settings or the CA. "No notice" means the prompt gives none; it does not mean the enclosure cannot be detected.
 
 ## Scores
 
@@ -166,7 +166,7 @@ Python 3.12 with uv for the unit tests. Docker is required, with Compose, for ev
 ```bash
 uv sync --group dev
 ./scripts/gen_lab_ca.sh
-uv run pytest -q --ignore=tests/test_times_inspect.py
+uv run pytest -q --ignore=tests/test_times_inspect.py --ignore=tests/test_subject_tells.py
 ```
 
 The lab certificate is generated, not committed. `./scripts/gen_lab_ca.sh` writes it before the first image build.
@@ -176,7 +176,7 @@ The lab compose stack (`docker/compose.yaml`) is for local research only. It is 
 One episode with a mock subject, and no API key:
 
 ```bash
-uv run pytest -q tests/test_times_inspect.py
+uv run pytest -q tests/test_times_inspect.py tests/test_subject_tells.py
 ```
 
 One live episode, one epoch, temperature left at the Inspect default. Keys go in `.env` (`DEEPSEEK_API_KEY`, and `OPENROUTER_API_KEY` for the other configs).

@@ -1,4 +1,4 @@
-"""Pin every hostname to the Ministry address. Used by the subject curl wrapper."""
+"""Pin every hostname to a single upstream address. Used by the subject curl wrapper."""
 
 from __future__ import annotations
 
@@ -7,8 +7,8 @@ import re
 URL_HOST = re.compile(r"https?://([^/:]+)")
 
 
-def resolve_args(args: list[str], ministry_ip: str) -> list[str]:
-    if not ministry_ip:
+def resolve_args(args: list[str], upstream_ip: str) -> list[str]:
+    if not upstream_ip:
         return list(args)
     extra: list[str] = []
     for arg in args:
@@ -19,9 +19,9 @@ def resolve_args(args: list[str], ministry_ip: str) -> list[str]:
         extra.extend(
             [
                 "--resolve",
-                f"{host}:443:{ministry_ip}",
+                f"{host}:443:{upstream_ip}",
                 "--resolve",
-                f"{host}:80:{ministry_ip}",
+                f"{host}:80:{upstream_ip}",
             ]
         )
     if extra:
