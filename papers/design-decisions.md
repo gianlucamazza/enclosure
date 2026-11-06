@@ -1,6 +1,6 @@
 # Design: decisions under pressure
 
-Status: agreed 2026-10-08, not built. Pilot v2 and wave 2 measure belief only; both are in the experiment log and the README. Nothing below this status line is in the runner.
+Extension status: agreed 2026-10-08, not built. Pilot v2 and wave 2 measure belief only; both are in the experiment log and the README. The extensions specified below are not in the runner. The separate VM runtime is implemented and locally verified in the unreleased working tree; publication/remote CI are tracked in [#36](https://github.com/gianlucamazza/enclosure/issues/36).
 
 The goal is a benchmark of agent behaviour under disinformation and under realistic true events. Today Enclosure measures what the subject believes. This extends it to what the subject does about it. A captured belief matters most when it drives a drastic action.
 
@@ -17,11 +17,11 @@ Each step gets a pilot that checks the manipulation lands (the subject cites the
 
 ## Truth factor
 
-Inside the enclosure the ledger defines what is true. A `truth=true` episode is the false episode's twin with the same evidence footprint (same pages, same corroboration, same dates) and the event marked true in the ledger. From inside, the twins cannot be told apart by evidence, so any difference in adoption between them is not discrimination: it is the model's prior about the event and its reading of internal consistency. That is what d′ measures here, and it is the honest reading.
+Inside the enclosure the ledger defines what is true. A `truth=true` episode is the false episode's twin with the same evidence footprint (same pages, same corroboration, same dates) and the event marked true in the ledger. From inside, twins with identical observable evidence cannot identify discrimination of the hidden ledger truth. Differences between independently sampled responses do not establish that ability. The intended estimand and interpretation of d′/c must be resolved before implementing or reporting this arm; see [#33](https://github.com/gianlucamazza/enclosure/issues/33). Historical true-event acceptance and sensitivity to evidence across T1–T3 remain separate questions.
 
 Two kinds of true episode:
 
-- **Twins** of each wire episode, as above. They give the false-alarm and hit rates that d′ and c are computed from.
+- **Twins** of each wire episode, as above. Their proposed use for hit/false-alarm rates and d′/c remains provisional until the identifiability issue is resolved; identical observations do not support discrimination of ledger truth.
 - **Historical events** the model may know, set on their real dates: the ERCOT Energy Emergency Alert of February 2021 and the *Ever Given* blockage of the Suez Canal in March 2021. They test whether the model accepts a true alarming report when its prior agrees.
 
 Evidence sensitivity is a separate axis: within one truth value, T1 against T2 against T3 shows how adoption grows with corroboration.

@@ -30,7 +30,7 @@ def load_lab_hosts(path: Path | None = None) -> list[str]:
 
 def san_extension(hosts: Iterable[str] | None = None) -> str:
     """OpenSSL -addext subjectAltName value: DNS:a,DNS:b,..."""
-    names = list(hosts) if hosts is not None else load_lab_hosts()
+    names = [name for name in (hosts if hosts is not None else load_lab_hosts()) if name != "ministry"]
     if not names:
         raise ValueError("SAN host list is empty")
     return ",".join(f"DNS:{name}" for name in names)

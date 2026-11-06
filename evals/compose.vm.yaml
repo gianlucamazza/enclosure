@@ -1,0 +1,69 @@
+services:
+  default:
+    image: enclosure-vm
+    build:
+      context: ..
+      dockerfile: docker/vm/Dockerfile
+    x-local: true
+    cap_add:
+    - NET_ADMIN
+    devices:
+    - /dev/net/tun:/dev/net/tun
+    - /dev/kvm:/dev/kvm
+    environment:
+      VM_CLOCK: ${SAMPLE_METADATA_CLOCK:-2026-06-01T09:00:00+00:00}
+    volumes:
+    - workspace:/export
+    depends_on:
+      ministry:
+        condition: service_healthy
+    healthcheck:
+      test:
+      - CMD
+      - test
+      - -f
+      - /run/ready
+      interval: 2s
+      timeout: 3s
+      retries: 90
+      start_period: 10s
+  ministry:
+    image: enclosure-ministry
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.ministry
+    x-local: true
+    environment:
+      MINISTRY_TOKEN: ${SAMPLE_METADATA_TOKEN:?SAMPLE_METADATA_TOKEN is required}
+      SUBJECT_FS_ROOT: /export
+      ENCLOSURE_TREATMENT: ${SAMPLE_METADATA_TREATMENT-T0}
+    command:
+    - enclosure
+    - serve
+    - --host
+    - 0.0.0.0
+    - --port
+    - '80'
+    - --world
+    - /var/enclosure/world.db
+    - --scenario
+    - /app/scenarios/times/python4.yaml
+    - --treatment
+    - ${SAMPLE_METADATA_TREATMENT-T0}
+    volumes:
+    - workspace:/export
+    networks:
+      default: {}
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - 'curl -sf -H "Authorization: Bearer $$MINISTRY_TOKEN" http://127.0.0.1/inner/health'
+      interval: 2s
+      timeout: 3s
+      retries: 30
+      start_period: 8s
+networks:
+  default:
+    internal: true
+volumes:
+  workspace: null

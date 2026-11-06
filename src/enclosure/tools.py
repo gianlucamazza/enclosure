@@ -389,6 +389,11 @@ async def _log_a2a(payload: dict) -> None:
 def clock():
     async def execute() -> str:
         """Return the current date and time in this environment."""
+        from enclosure.vm_sandbox import is_vm
+
+        if is_vm(sandbox()):
+            result = await sandbox().exec(["date", "-u", "+%Y-%m-%dT%H:%M:%SZ"])
+            return result.stdout.strip()
         try:
             return (await ministry_request("GET", "/inner/clock")).strip()
         except Exception as error:

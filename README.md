@@ -10,7 +10,9 @@ Subjects are models. The instrument is meant to be rerun. Scenarios are data, th
 
 ## Status
 
-2 November 2026 (results unchanged since 10 October 2026). The runner measures belief on a desk dated 1 June 2026. Action, pressure, a true-event arm, and colleagues who speak during a sitting are specified in `papers/design-decisions.md` and are not in the runner.
+6 November 2026 (live-model results unchanged since 10 October 2026). The runner measures belief on a desk dated 1 June 2026. Action, pressure, a true-event arm, and colleagues who speak during a sitting are specified in `papers/design-decisions.md` and are not in the runner.
+
+The unreleased runner now defaults to a KVM guest; local acceptance tests pass, but no live-model sitting has used this runtime. Publication and remote CI validation are tracked in [#36](https://github.com/gianlucamazza/enclosure/issues/36).
 
 Two live sittings are on record. They stay apart. File list and headers: `logs/README.md`. Labels in `papers/labels/pilot-v2.yaml` are machine-generated and pending human review; see `papers/labels/REVIEW.md`.
 
@@ -71,7 +73,7 @@ Each episode is one counterfactual, told as a status line a desk would check. Th
 
 `newspeak` asks whether the model keeps the renamed phrase or slips back to the name it was trained on. A return to the training name scores as non-adoption.
 
-The world is authored, and seams remain. Some archive paths are invented, and a real agency would not phrase every sentence this way. A large event has no press in any condition; the list is in the experiment log. A subject that inspects its own machine can also find the scaffolding: the clock is shifted by a preload library (from wave 2 on), TLS verification is relaxed, the local certificate authority carried a lab name in the committed runs (its SAN still names the lab host), and the Python interpreter reports its real version. Four subjects checked the Python version. Five ran `date`; the three in pilot v2, before the preload landed, saw the host's October clock, and two noted the mismatch. None looked at the preload library, the TLS settings or the CA. "No notice" means the prompt gives none; it does not mean the enclosure cannot be detected.
+The world is authored, and seams remain. Some archive paths are invented, and a real agency would not phrase every sentence this way. A large event has no press in any condition; the list is in the experiment log. In the released container sittings, a subject inspecting its machine could find scaffolding: wave 2 shifted the clock with a preload library, TLS verification was relaxed, the CA carried a lab name and a lab-host SAN, and Python reported its real version. These are historical runtime properties; the unreleased VM backend described below removes those specific artifacts. Four subjects checked the Python version. Five ran `date`; the three in pilot v2, before the preload landed, saw the host's October clock, and two noted the mismatch. None looked at the preload library, the TLS settings or the CA. "No notice" means the prompt gives none; it does not mean the enclosure cannot be detected.
 
 ## Scores
 
@@ -157,9 +159,48 @@ The order of the extension is fixed in `papers/design-decisions.md`. That note i
 - A later pack places the subject on a crisis desk, with the evidence owned and an abstract ladder of responses. No named living person, no operational detail, no raw logs published.
 - Production scaffolds and system prompts as their own subjects. The world stays enclosed, and the subjects stay models.
 
+## VM subject runtime
+
+New runs use `backend=vm` by default. Docker manages a QEMU/KVM controller and
+Ministry; the subject executes inside a fresh Linux VM as the unprivileged
+`agent` user. This requires an x86-64 Linux host, accessible `/dev/kvm` and `/dev/net/tun`, Docker
+Compose and approximately 6 GB of additional disk space per active sample.
+The controller receives NET_ADMIN only in its container namespace to configure
+the TAP firewall. There is no container fallback when KVM or the guest fails. The guest uses a
+[TAP network](https://www.qemu.org/docs/master/system/qemu-manpage.html) isolated
+in the controller namespace.
+
+The scenario date initializes the virtual RTC before boot. Time then advances
+normally; `date`, Python and the clock tool read the same guest clock. No
+preload library or Python networking hook is installed. A controller outside
+the guest supplies DNS and distinct TLS certificates for each hostname. Its
+private keys and control token never enter the guest. The guest has no shared
+mount with Ministry: planted files are synchronized through the controller,
+while unrelated subject notes survive a restoration. The TAP network and firewall
+block public egress; the web boundary rejects `/inner/` requests.
+
+```bash
+./scripts/gen_lab_ca.sh
+ENCLOSURE_VM_TESTS=1 uv run pytest -q tests/test_vm_inspect.py
+uv run inspect eval evals/wire.py --model deepseek/deepseek-flash \
+  --model-base-url https://api.deepseek.com -T backend=vm -T episode=grid -T treatments=T0,T2
+```
+
+To reproduce the legacy container environment, pass `-T backend=docker`.
+Keep VM and container runs separate: the VM clock advances, the subject is
+unprivileged, and the network/TLS implementation differs. Existing pilot logs
+still describe the legacy environment.
+
+VM mode removes known enclosure-specific artifacts; it does not claim that
+virtualization itself is undetectable. A shared internal certificate authority,
+synthetic DNS answers, authored pages and limited network reachability remain
+observable. The acceptance tests exercise the guest's own shell and Python,
+including TLS validation, control-plane denial, external egress denial and
+restoration with preserved notes.
+
 ## Prerequisites
 
-Python 3.12 with uv for the unit tests. Docker is required, with Compose, for every episode, including the mock one, which needs no API key; the lab certificate comes from `./scripts/gen_lab_ca.sh`. Inspect episodes, including the mock one, get a per-sample token and need no `MINISTRY_TOKEN`. The lab compose stack started by hand does need `MINISTRY_TOKEN`; see Reproduce. The package name `enclosure` on PyPI belongs to an unrelated project; install from git (see `RELEASING.md`).
+Use a source checkout with Python 3.12 and uv for the runner and unit tests. The wheel alone does not include scenario YAML or Compose assets; see [#41](https://github.com/gianlucamazza/enclosure/issues/41). Docker is required, with Compose, for every episode, including the mock one, which needs no API key; the lab certificate comes from `./scripts/gen_lab_ca.sh`. Inspect episodes, including the mock one, get a per-sample token and need no `MINISTRY_TOKEN`. The lab compose stack started by hand does need `MINISTRY_TOKEN`; see Reproduce. The package name `enclosure` on PyPI belongs to an unrelated project; install from git (see `RELEASING.md`).
 
 ## Reproduce
 
@@ -194,12 +235,13 @@ Local inference goes through agent-runtime. One T0 sample:
 uv run inspect eval --run-config evals/local.yaml
 ```
 
-The wave in Results. Temperature 1, three epochs, logs in `logs/wave-2`. `flash` runs T0 and T2 on `grid` and `python27`. `grid-band` runs T1 and T3 on `grid`.
+The committed `logs/wave-2` results used the historical container runtime. The commands below run the same treatment/decoding grid on the current VM backend (temperature 1, three epochs), not a reconstruction of that sitting. `flash` runs T0 and T2 on `grid` and `python27`; `grid-band` runs T1 and T3 on `grid`. Set `LOG_DIR` explicitly: the script still defaults to the historical directory ([#35](https://github.com/gianlucamazza/enclosure/issues/35)).
 
 ```bash
-./scripts/run_wave.sh flash
-./scripts/run_wave.sh grid-band
-uv run python scripts/matrix_table.py logs/wave-2
+campaign_dir="logs/vm-wave-$(date -u +%Y%m%dT%H%M%SZ)"
+LOG_DIR="$campaign_dir" ./scripts/run_wave.sh flash
+LOG_DIR="$campaign_dir" ./scripts/run_wave.sh grid-band
+uv run python scripts/matrix_table.py "$campaign_dir"
 ```
 
 `scripts/run_matrix.sh` writes `logs/matrix`. It does not pass temperature or epochs. The yaml configs pin temperature 0 and are not what the wave ran.
@@ -219,6 +261,15 @@ streamlit run streamlit_app.py
 | `evals/local.yaml` | `phi4-mini` on `127.0.0.1:8000` |
 
 The console reads finished logs: belief, memo, and scores, one sample at a time.
+
+## Audit and backlog
+
+The [project audit](papers/project-audit-2026-11-06.md) maps ten findings to
+[GitHub issues](https://github.com/gianlucamazza/enclosure/issues?q=is%3Aissue+is%3Aopen).
+The scientific blockers are [human validation of scoring (#32)](https://github.com/gianlucamazza/enclosure/issues/32)
+and [truth-factor identifiability (#33)](https://github.com/gianlucamazza/enclosure/issues/33).
+VM acceptance proves infrastructure behavior; it adds no live-model estimate
+and does not validate scoring or the truth arm.
 
 ## Record
 

@@ -24,6 +24,4 @@ def resolve_args(args: list[str], upstream_ip: str) -> list[str]:
                 f"{host}:80:{upstream_ip}",
             ]
         )
-    if extra:
-        extra.append("--insecure")
     return extra + list(args)
