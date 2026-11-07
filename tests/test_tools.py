@@ -25,6 +25,7 @@ def test_fetch_url_keeps_https_and_the_host():
 
 def test_curl_pins_every_host_to_the_ministry():
     args = resolve_args(["-sS", "https://news.example/story"], "10.89.0.2")
+    assert "--insecure" not in args
     assert "--resolve" in args
     assert "news.example:443:10.89.0.2" in args
     assert "news.example:80:10.89.0.2" in args

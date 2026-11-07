@@ -22,7 +22,6 @@ COMPOSE_SERVICE_DNS = "ministry"
 REQUIRED_HOSTS = ("en.wikipedia.org", "peps.python.org", "docs.aws.amazon.com")
 # Every DNS name already on the cert; the host list must keep them.
 EXISTING_SAN_HOSTS = (
-    "ministry",
     "www.python.org",
     "python.org",
     "docs.python.org",
@@ -107,7 +106,7 @@ def test_compose_aliases_and_extra_hosts_are_in_the_list_and_san():
     san = _san_hosts(san_extension())
     missing: list[str] = []
     for relative in COMPOSE_FILES:
-        for name in _compose_subject_hosts(_compose_data(relative)):
+        for name in _compose_subject_hosts(_compose_data(relative)) - {COMPOSE_SERVICE_DNS}:
             if name not in hosts or name not in san:
                 missing.append(f"{relative}:{name}")
     assert missing == []
@@ -130,4 +129,8 @@ def test_gen_lab_ca_builds_san_from_the_host_list():
     assert "lab_hosts.py" in script or "lab-hosts.txt" in script
     assert "subjectAltName=DNS:" not in script
     assert "/C=US/O=Engineering/CN=Internal Root CA" in script
-    assert "-days 3650" in script
+    assert "-startdate 20200101000000Z" in script
+
+
+def test_control_service_is_not_in_public_certificate():
+    assert "ministry" not in _san_hosts(san_extension())

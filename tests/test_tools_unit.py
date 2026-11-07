@@ -285,6 +285,7 @@ def test_post_collects_replies(env, monkeypatch):
 
 
 def test_clock_tool(monkeypatch):
+    monkeypatch.setattr(tools, "sandbox", lambda: None)
     async def ok(method, path, payload=None):
         return " 2026-06-01T09:00:00Z\n"
 

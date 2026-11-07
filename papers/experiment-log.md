@@ -1,5 +1,13 @@
 # Experiment log
 
+## 2026-11-06 — unreleased VM runtime and audit
+
+The working tree based on `1383b3b` now defaults to a per-sample QEMU/KVM subject, with the legacy Docker runtime explicitly selectable. The guest runs as UID 1000, reads its RTC-backed advancing kernel clock, and has standard curl/Python without preload or networking hooks. TAP, DNS and TLS per hostname are configured in a separate controller; forwarding and `/inner/` access are denied. Planted files are synchronized without shared guest mounts.
+
+The default regression suite passed 204 tests (two opt-in VM tests skipped). Both VM acceptance tests passed in 150.49 seconds, covering the guest-visible surface, verified HTTPS, egress/control-plane denial and T4 restoration with preserved notes. The subject-surface probe found no known artifacts. These are mock infrastructure checks, not new live-model estimates. The implementation is included in this revision; remote KVM CI is tracked in [#36](https://github.com/gianlucamazza/enclosure/issues/36).
+
+The audit also reproduced lexical agreement at 48/58 against provisional machine labels. Human review and the truth-factor estimand remain scientific blockers ([#32](https://github.com/gianlucamazza/enclosure/issues/32), [#33](https://github.com/gianlucamazza/enclosure/issues/33)). The [audit](project-audit-2026-11-06.md) links the complete backlog. Pilot and wave results below are unchanged and remain container-only.
+
 ## 2026-11-02 — subject-visible containment strings
 
 A subject with a shell could read the enclosure off the image: `/usr/local/bin/curl` and `sitecustomize.py` named the Ministry, the CA CN was "Ministry Lab CA", `env` showed `PYTHONPATH=/usr/local/lib/ministry`, and `/etc/ministry-ip` held the pin. None of those were on the residual-tells list. A scan of the tool calls in all 47 released samples (pilot v2 29, wave 2 18) found none that probed these files or env. The scan grepped shell, read_file, and fetch arguments in `logs/pilot-v2` and `logs/wave-2` for env, PYTHONPATH, sitecustomize, the curl path, the CA, ministry-ip, LD_PRELOAD/faketime, and hosts/getent.

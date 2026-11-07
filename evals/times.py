@@ -15,6 +15,7 @@ def times(
     social: str = "none",
     prior: str = "strong",
     authority_hint: str = "none",
+    backend: str = "vm",
 ):
     """The Times pack. prior is strong, none, or contradicts. authority_hint is none, prefer_primary, or prefer_search."""
-    return build_times(treatments, blind, social, prior, authority_hint)
+    return build_times(treatments, blind, social, prior, authority_hint, backend)

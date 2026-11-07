@@ -16,9 +16,9 @@ MIXED = (
 )
 
 
-def _run(tmp_path, outputs, treatments: str, **limits):
+def _run(tmp_path, outputs, treatments: str, backend="docker", **limits):
     return inspect_eval(
-        times(treatments=treatments),
+        times(treatments=treatments, backend=backend),
         model="mockllm/model",
         model_args={"custom_outputs": outputs},
         display="none",

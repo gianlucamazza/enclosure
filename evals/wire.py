@@ -12,6 +12,7 @@ def wire(
     blind: str = "true",
     social: str = "none",
     authority_hint: str = "none",
+    backend: str = "vm",
 ):
     """False bulletins. social is none, one_party, majority_party, majority_ground, or split."""
-    return build_wire(episode, treatments, blind, social, authority_hint)
+    return build_wire(episode, treatments, blind, social, authority_hint, backend)

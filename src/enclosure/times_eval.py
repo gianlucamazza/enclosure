@@ -118,13 +118,23 @@ async def _ministry(method: str, path: str, payload: dict | None = None) -> str:
 
 async def _set_subject_clock(clock: str) -> None:
     """Stop the subject container's wall clock on the scenario instant."""
+    from enclosure.vm_sandbox import is_vm
+
+    if is_vm(sandbox()):
+        return  # RTC is set before boot from sample metadata, never via a guest hook.
     await sandbox().write_file("/etc/faketimerc", frozen_clock(clock) + "\n")
 
 
 async def _read_subject_clock() -> dict[str, str]:
     """File stamp, date(1), and Python. All three should be the desk instant."""
+    from enclosure.vm_sandbox import is_vm
+
     try:
-        stamp = (await sandbox().read_file("/etc/faketimerc")).strip()
+        stamp = (
+            (await _exec_text(["date", "-u", "+%Y-%m-%dT%H:%M:%SZ"]))
+            if is_vm(sandbox())
+            else (await sandbox().read_file("/etc/faketimerc")).strip()
+        )
     except Exception:
         stamp = ""
     date = await _exec_text(["date", "-u"])
@@ -494,18 +504,25 @@ def _samples(
                     "authority_hint": authority_hint,
                     "prior": spec.prior,
                     "token": secrets.token_hex(16),
+                    "clock": spec.clock,
                 },
             )
         )
     return samples
 
 
-def _task(samples: list[Sample]) -> Task:
+def _task(samples: list[Sample], backend: str = "vm") -> Task:
+    if backend not in {"vm", "docker"}:
+        raise ValueError("backend must be vm or docker")
+    from enclosure import vm_sandbox  # noqa: F401 -- register the provider
+
     return Task(
         dataset=samples,
         solver=times_episode(),
         scorer=times_score(),
-        sandbox=("docker", str(COMPOSE)),
+        sandbox=("enclosure_vm", str(REPO / "evals/compose.vm.yaml"))
+        if backend == "vm"
+        else ("docker", str(COMPOSE)),
         message_limit=100,
         epochs=Epochs(1, mean_score(_defined_float)),
     )
@@ -525,6 +542,7 @@ def times(
     social: str = "none",
     prior: str = "strong",
     authority_hint: str = "none",
+    backend: str = "vm",
 ) -> Task:
     """The Times pack. prior is strong, none, or contradicts. authority_hint is none, prefer_primary, or prefer_search."""
     return _task(
@@ -534,7 +552,8 @@ def times(
             blind=_as_bool(blind),
             social=social,
             authority_hint=authority_hint,
-        )
+        ),
+        backend=backend,
     )
 
 
@@ -544,6 +563,7 @@ def wire(
     blind: str = "true",
     social: str = "none",
     authority_hint: str = "none",
+    backend: str = "vm",
 ) -> Task:
     """Wire-bulletin pack. social sets the colleague majority, separate from T0–T5."""
     samples: list[Sample] = []
@@ -562,7 +582,7 @@ def wire(
                 authority_hint=authority_hint,
             )
         )
-    return _task(samples)
+    return _task(samples, backend=backend)
 
 
 def _as_bool(value: str | bool) -> bool:

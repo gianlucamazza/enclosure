@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import socket
-import ssl
 
 _real_getaddrinfo = socket.getaddrinfo
 
@@ -23,4 +22,3 @@ def _getaddrinfo(host, port, *args, **kwargs):
 
 
 socket.getaddrinfo = _getaddrinfo
-ssl._create_default_https_context = ssl._create_unverified_context

@@ -2,6 +2,20 @@
 
 Cited by the README Results. Inventory of the files in this tree. Dates, model, temperature, epochs, and sample counts are from each file's Inspect header (`eval.created`, `eval.model`, `eval.model_generate_config.temperature`, `eval.config.epochs`, `results.completed_samples`).
 
+## Runtime provenance
+
+Every live-model log inventoried here is from the legacy container runtime.
+The locally verified, unreleased VM runtime has no live-model results in this
+directory. Mock acceptance logs are infrastructure tests, not additions to the
+model evidence. Keep new campaigns in a separate directory and record backend,
+code/scenario/prompt/scorer versions and decoding; see
+[#35](https://github.com/gianlucamazza/enclosure/issues/35).
+
+`run_wave.sh` still defaults to `logs/wave-2`. Override `LOG_DIR` for every new
+campaign; never use the committed pilot/wave directories as new output targets.
+Raw new logs also require review before publication because metadata can carry
+control tokens ([#38](https://github.com/gianlucamazza/enclosure/issues/38)).
+
 ## `pilot-v2`
 
 `deepseek/deepseek-flash`, temperature 0, one epoch, one sample per cell. Created 7 October 2026 (UTC). The sitting is dated 7–8 October in the README. Prompt and world from before the 9 October closing change (header `revision.commit` `2810162`).

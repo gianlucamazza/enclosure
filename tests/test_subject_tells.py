@@ -58,5 +58,10 @@ def test_subject_image_hides_ministry_strings():
     assert "ministry" not in env.lower()
     assert "ministry" not in curl.lower()
     assert "ministry" not in sitecustomize.lower()
+    assert "_create_unverified_context" not in sitecustomize
+    assert "--insecure" not in netpin
     assert "ministry" not in netpin.lower()
     assert "ministry" not in subject.lower()
+
+    san = _run(["openssl", "x509", "-noout", "-ext", "subjectAltName"], input=pem).stdout
+    assert "ministry" not in san.lower()
