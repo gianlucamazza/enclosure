@@ -16,6 +16,62 @@ from enclosure.plots import (
 )
 from enclosure.review import identity
 
+LOGS_DIR = Path("logs")
+
+
+def _allowed_log_dirs(root: Path) -> dict[str, Path]:
+    """Map relative and absolute names to directories already under *root*."""
+    root = root.resolve()
+    allowed: dict[str, Path] = {}
+
+    def add(resolved: Path, rel: str) -> None:
+        if not resolved.is_relative_to(root):
+            return
+        allowed[str(resolved)] = resolved
+        if rel in {"", "."}:
+            allowed[str(LOGS_DIR)] = resolved
+            allowed[LOGS_DIR.as_posix()] = resolved
+        else:
+            allowed[rel] = resolved
+            nested = LOGS_DIR / rel
+            allowed[str(nested)] = resolved
+            allowed[nested.as_posix()] = resolved
+
+    add(root, ".")
+    if root.is_dir():
+        for path in root.rglob("*"):
+            if not path.is_dir():
+                continue
+            resolved = path.resolve()
+            if not resolved.is_relative_to(root):
+                continue
+            add(resolved, resolved.relative_to(root).as_posix())
+    return allowed
+
+
+def constrain_log_directory(root: str, *, base: Path | None = None) -> Path:
+    """Return an already-enumerated directory under logs, or reject.
+
+    User input is only used as a dictionary key into directories discovered
+    under logs. Nothing the caller supplies is opened or resolved.
+    """
+    allowed_root = (base if base is not None else LOGS_DIR).resolve()
+    name = str(root).strip()
+    if not name:
+        raise ValueError(f"Log directory {root!r} must stay inside {allowed_root}")
+    incoming = Path(name)
+    if any(part == ".." for part in incoming.parts):
+        raise ValueError(f"Log directory {root!r} must stay inside {allowed_root}")
+    allowed = _allowed_log_dirs(allowed_root)
+    chosen = allowed.get(name)
+    if chosen is None and not incoming.is_absolute():
+        rel = Path(*[part for part in incoming.parts if part not in {".", ""}]).as_posix()
+        chosen = allowed.get(rel) or allowed.get(str(LOGS_DIR / rel))
+    if chosen is None or not chosen.is_relative_to(allowed_root):
+        raise ValueError(f"Log directory {root!r} must stay inside {allowed_root}")
+    return chosen
+
+
 st.set_page_config(page_title="Enclosure", layout="wide")
 st.title("Enclosure")
 st.caption("Belief, desk memo, and scores from a finished run.")
@@ -23,6 +79,7 @@ st.caption("Belief, desk memo, and scores from a finished run.")
 
 @st.cache_data(ttl=60)
 def load_rows(root: str) -> list[dict]:
+    log_dir = constrain_log_directory(root)
     rows = []
     annotations_path = Path("papers/labels/ai-adjudication-2026-11-12.json")
     annotations = (
@@ -30,7 +87,7 @@ def load_rows(root: str) -> list[dict]:
         if annotations_path.exists()
         else {}
     )
-    for path in sorted(Path(root).glob("*.eval")):
+    for path in sorted(log_dir.glob("*.eval")):
         log = read_eval_log(str(path))
         model = getattr(log.eval, "model", "") or ""
         source_sha = hashlib.sha256(path.read_bytes()).hexdigest()
@@ -102,7 +159,11 @@ root = st.text_input("Log directory", value=selected)
 st.caption(
     "Campaigns are shown separately. Historical prompts, runtimes and decoding can differ; label review may be incomplete."
 )
-rows = load_rows(root)
+try:
+    rows = load_rows(root)
+except ValueError as exc:
+    st.error(str(exc))
+    st.stop()
 if not rows:
     st.info("No .eval logs in that directory yet.")
     st.stop()
