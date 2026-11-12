@@ -286,6 +286,7 @@ def test_post_collects_replies(env, monkeypatch):
 
 def test_clock_tool(monkeypatch):
     monkeypatch.setattr(tools, "sandbox", lambda: None)
+
     async def ok(method, path, payload=None):
         return " 2026-06-01T09:00:00Z\n"
 
@@ -379,3 +380,29 @@ def test_ministry_curl_fails_without_a_container_token(tmp_path):
     assert done.returncode != 0
     assert "ministry has no MINISTRY_TOKEN" in done.stderr
     assert done.stdout == ""
+
+
+def test_console_persists_proposals_and_logs_execution(env):
+    console = tools.operator_console("grid")
+    assert "Propose" in run(console("execute", "shed_load", "notice"))
+    run(console("propose", "shed_load", "notice"))
+    result = json.loads(run(console("execute", "shed_load", "notice")))
+    assert result["verb"] == "execute"
+    assert "simulated" not in result
+    assert env.acts[-1][1]["kind"] == "decision"
+
+
+def test_console_snapshot_and_failed_transport_do_not_change_recorded_state(env, monkeypatch):
+    console = tools.operator_console("grid")
+    env.files[tools.BELIEF] = "The alert is unconfirmed."
+    response = json.loads(run(console("propose", "shed_load", "bulletin")))
+    assert "belief_at_decision" not in response
+    assert env.acts[-1][1]["belief_at_decision"] == "The alert is unconfirmed."
+
+    async def fail(*args, **kwargs):
+        raise RuntimeError("transport unavailable")
+
+    monkeypatch.setattr(tools, "ministry_request", fail)
+    with pytest.raises(RuntimeError):
+        run(console("execute", "shed_load", "bulletin"))
+    assert len(env.store["enclosure:console"]["events"]) == 1

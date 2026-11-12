@@ -22,7 +22,7 @@ jobs:
       - name: Install
         run: uv sync --group dev --locked
       - name: Lint
-        run: uv run ruff check src tests evals
+        run: uv run ruff check src tests evals scripts streamlit_app.py
       - name: Typecheck
         run: uv run mypy
       # Informational: 16 files are unformatted; a later PR formats them.
@@ -40,6 +40,18 @@ jobs:
           uv venv /tmp/enclosure-smoke
           uv pip install --python /tmp/enclosure-smoke/bin/python "$wheel"
           /tmp/enclosure-smoke/bin/enclosure --help
+          /tmp/enclosure-smoke/bin/python - <<'PY'
+          import os
+          import tempfile
+          os.chdir(tempfile.mkdtemp(prefix="enclosure-installed-"))
+          from enclosure.times_eval import wire
+          try:
+              wire(episode="grid", treatments="T0")
+          except FileNotFoundError as error:
+              assert "source checkout" in str(error), str(error)
+          else:
+              raise AssertionError("Standalone wheel must explain the checkout requirement")
+          PY
 
   docker-e2e:
     runs-on: ubuntu-latest
@@ -90,4 +102,4 @@ jobs:
       - name: VM acceptance
         env:
           ENCLOSURE_VM_TESTS: "1"
-        run: uv run pytest -q tests/test_vm_inspect.py
+        run: uv run pytest -q tests/test_vm_inspect.py tests/test_vm_interventions.py

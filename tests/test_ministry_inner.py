@@ -197,3 +197,14 @@ def test_load_respects_custom_scenarios_root():
 def test_unknown_inner_path_is_404_with_token():
     _, client = _setup()
     assert client.get("/inner/unknown", headers=AUTH).status_code == 404
+
+
+def test_simulated_decision_keeps_its_event_kind():
+    world, client = _setup()
+    response = client.post(
+        "/inner/act",
+        headers=AUTH,
+        json={"kind": "decision", "verb": "execute", "option": "shed_load", "simulated": True},
+    )
+    assert response.status_code == 200
+    assert world.events("decision")[0].payload["simulated"] is True

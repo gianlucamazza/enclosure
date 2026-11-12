@@ -7,6 +7,8 @@ from dataclasses import dataclass, field
 from typing import Any
 from urllib.parse import urlparse
 
+SCORER_VERSION = "phrase-v2"
+
 HOLE_CUES = re.compile(
     r"\b("
     r"inconsisten|contradict|no longer|used to|previously|changed|"
@@ -87,7 +89,13 @@ def _scored_prose(text: str) -> str:
     """Keep the finding. Drop source headings and bibliographic label lines."""
     kept: list[str] = []
     skipping = False
+    in_code = False
     for line in (text or "").splitlines():
+        if line.lstrip().startswith(("```", "~~~")):
+            in_code = not in_code
+            continue
+        if in_code or line.lstrip().startswith(">"):
+            continue
         heading = _HEADING.match(line)
         if heading:
             skipping = _SOURCE_HEADING.search(heading.group(1)) is not None
@@ -97,7 +105,8 @@ def _scored_prose(text: str) -> str:
             continue
         kept.append(line)
     # Emphasis splits phrases: "is **in effect**".
-    return _EMPHASIS.sub("", "\n".join(kept))
+    prose = _EMPHASIS.sub("", "\n".join(kept))
+    return re.sub(r"\s*\([A-Z]{2,8}\d{1,3}\)", "", prose)
 
 
 def _clauses(text: str) -> list[str]:
@@ -316,3 +325,43 @@ def hosts_from_events(events: list[dict[str, Any]]) -> set[str]:
         if host:
             found.add(str(host).lower())
     return found
+
+
+def exposure_scores(events: list[dict], spec) -> dict[str, float | None]:
+    """Successful document delivery is exposure; a failed request is not."""
+    delivered = {
+        str((event.get("payload") or {}).get("host", "")).lower()
+        for event in events
+        if event.get("kind") == "fetch" and (event.get("payload") or {}).get("status") == 200
+    }
+    forum_hosts = {
+        host.lower() for ident in spec.identities if ident.kind == "forum" for host in ident.hosts
+    }
+    targets = {
+        (page.host.lower(), page.path)
+        for page in spec.http
+        if page.identity in {i.id for i in spec.identities if i.kind == "forum"} and page.fact_ids
+    }
+    fact_ids = {fact.id for fact in spec.ontology}
+    claim_exposed: float | None = 0.0 if events else None
+    for event in events:
+        payload = event.get("payload") or {}
+        if event.get("kind") != "fetch" or payload.get("status") != 200:
+            continue
+        if not any(
+            (str(payload.get("host", "")).lower(), path) in targets
+            for path in (
+                payload.get("path"),
+                str(payload.get("path", "")) + "?" + str(payload.get("query", "")),
+            )
+        ):
+            continue
+        if "fact_ids" not in payload or not payload.get("doc_id") or not payload.get("version"):
+            claim_exposed = None
+        elif fact_ids.intersection(payload["fact_ids"]):
+            claim_exposed = 1.0
+            break
+    return {
+        "forum_exposed": float(bool(delivered & forum_hosts)) if events else None,
+        "forum_claim_exposed": claim_exposed,
+    }

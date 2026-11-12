@@ -1,16 +1,20 @@
 """Experimenter view of Inspect logs: belief, memo, and scores."""
 
+import hashlib
+import json
 from pathlib import Path
 
 import pandas as pd
 import streamlit as st
 from inspect_ai.log import read_eval_log
 
+from enclosure.analysis import comparison_group
 from enclosure.plots import (
     adoption_by_treatment,
     stated_vs_adopted,
     verification_vs_adoption,
 )
+from enclosure.review import identity
 
 st.set_page_config(page_title="Enclosure", layout="wide")
 st.title("Enclosure")
@@ -20,9 +24,16 @@ st.caption("Belief, desk memo, and scores from a finished run.")
 @st.cache_data(ttl=60)
 def load_rows(root: str) -> list[dict]:
     rows = []
+    annotations_path = Path("papers/labels/ai-adjudication-2026-11-12.json")
+    annotations = (
+        {a["record_id"]: a for a in json.loads(annotations_path.read_text())["records"]}
+        if annotations_path.exists()
+        else {}
+    )
     for path in sorted(Path(root).glob("*.eval")):
         log = read_eval_log(str(path))
         model = getattr(log.eval, "model", "") or ""
+        source_sha = hashlib.sha256(path.read_bytes()).hexdigest()
         for sample in log.samples or []:
             scores = sample.scores or {}
             value = next(iter(scores.values())).value if scores else {}
@@ -32,13 +43,46 @@ def load_rows(root: str) -> list[dict]:
             rows.append(
                 {
                     "log": path.name,
+                    "annotations": {
+                        channel: annotations.get(
+                            identity(
+                                path.parent.name,
+                                source_sha,
+                                str(model),
+                                str(sample.id),
+                                int(sample.epoch or 1),
+                                channel,
+                            )
+                        )
+                        for channel in ("belief", "memo")
+                    },
                     "model": model,
+                    "scenario": meta.get("scenario", str(sample.id).rsplit(".", 1)[0]),
+                    "factors": {
+                        key: meta.get(key)
+                        for key in (
+                            "scaffold",
+                            "action_episode",
+                            "pressure",
+                            "deadline_actions",
+                            "social",
+                            "authority_hint",
+                            "blind",
+                            "prior",
+                            "event_truth",
+                        )
+                    },
+                    "decoding": log.eval.model_generate_config.model_dump(mode="json")
+                    if log.eval.model_generate_config
+                    else {},
                     "sample": str(sample.id),
                     "treatment": str(meta.get("treatment", "")),
                     "blind": str(meta.get("blind", "")),
                     "prior": str(meta.get("prior", "")),
                     "authority_hint": str(meta.get("authority_hint", "")),
                     "scores": value,
+                    "provenance": meta.get("provenance", {}),
+                    "backend": meta.get("backend", "unknown (historical)"),
                     "answer": next(iter(scores.values())).answer if scores else "",
                     "timeline": (next(iter(scores.values())).metadata or {}).get("timeline", [])
                     if scores
@@ -48,7 +92,16 @@ def load_rows(root: str) -> list[dict]:
     return rows
 
 
-root = st.text_input("Log directory", value="logs/matrix")
+available = (
+    sorted(str(p) for p in Path("logs").iterdir() if p.is_dir() and any(p.glob("*.eval")))
+    if Path("logs").exists()
+    else []
+)
+selected = st.selectbox("Campaign", available) if available else "logs"
+root = st.text_input("Log directory", value=selected)
+st.caption(
+    "Campaigns are shown separately. Historical prompts, runtimes and decoding can differ; label review may be incomplete."
+)
 rows = load_rows(root)
 if not rows:
     st.info("No .eval logs in that directory yet.")
@@ -61,6 +114,33 @@ labels = [
 picked = st.selectbox("Sample", options=range(len(rows)), format_func=lambda i: labels[i])
 row = rows[picked]
 scores = row["scores"]
+provenance = row["provenance"]
+st.caption(
+    f"Runtime: {row['backend']} · Labels: {provenance.get('labels', 'unknown; not human-validated')}"
+)
+with st.expander("Run provenance and decoding"):
+    st.json({"provenance": provenance or "unknown", "decoding": row["decoding"]})
+
+
+rows = [item for item in rows if comparison_group(item) == comparison_group(row)]
+st.caption(
+    "Charts include only the selected scenario, model, factors, decoding and runtime provenance. Historical runs without provenance are shown one log at a time."
+)
+st.subheader("Annotated conclusions")
+st.table(
+    [
+        {
+            "channel": channel,
+            "label": annotation.get("label") if annotation else "not reviewed",
+            "authorship": annotation.get("reviewer_type") if annotation else "unknown",
+        }
+        for channel, annotation in row["annotations"].items()
+    ]
+)
+st.caption(
+    "AI annotations are exploratory and are not human validation. Missing labels are not denials."
+)
+st.subheader("Automated diagnostic scores")
 metrics = (
     "belief_adoption",
     "historical_mention",
@@ -104,7 +184,7 @@ else:
 adopted = adoption_by_treatment(
     [{"treatment": row["treatment"], "sample": row["sample"], **row["scores"]} for row in rows]
 )
-st.subheader("Adoption by treatment")
+st.subheader("Diagnostic adoption by treatment")
 if adopted:
     st.bar_chart(pd.DataFrame(adopted), x="treatment", y="adopted")
 else:
@@ -113,7 +193,7 @@ else:
 points = verification_vs_adoption(
     [{"treatment": row["treatment"], "sample": row["sample"], **row["scores"]} for row in rows]
 )
-st.subheader("Verification vs adoption")
+st.subheader("Diagnostic verification vs adoption")
 if points:
     st.scatter_chart(pd.DataFrame(points), x="verification", y="adopted")
 else:

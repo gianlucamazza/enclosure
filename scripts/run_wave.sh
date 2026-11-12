@@ -31,7 +31,13 @@ source .env
 set +a
 docker info >/dev/null
 
-LOG_DIR="${LOG_DIR:-logs/wave-2}"
+LOG_DIR="${LOG_DIR:-logs/campaign-$(date -u +%Y%m%dT%H%M%SZ)}"
+LOG_DIR="$(realpath -m -- "$LOG_DIR")"
+case "$LOG_DIR" in
+  "$ROOT/logs/pilot-v2"|"$ROOT/logs/pilot-v2/"*|"$ROOT/logs/wave-2"|"$ROOT/logs/wave-2/"*)
+    echo "Historical log directories are read-only campaign archives" >&2; exit 1 ;;
+esac
+BACKEND="${BACKEND:-vm}"
 mkdir -p "$LOG_DIR"
 
 run_eval() {
@@ -44,6 +50,7 @@ run_eval() {
     reasoning=(--reasoning-effort none)
   fi
   uv run inspect eval "$task" \
+    -T backend="$BACKEND" \
     --model "$model" \
     --model-base-url "$base_url" \
     --temperature 1 \

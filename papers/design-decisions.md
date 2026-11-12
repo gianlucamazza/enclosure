@@ -1,6 +1,6 @@
 # Design: decisions under pressure
 
-Extension status: agreed 2026-10-08, not built. Pilot v2 and wave 2 measure belief only; both are in the experiment log and the README. The extensions specified below are not in the runner. The separate VM runtime is implemented and locally verified in the unreleased working tree; publication/remote CI are tracked in [#36](https://github.com/gianlucamazza/enclosure/issues/36).
+Extension status: initially agreed 2026-10-08. Core development mechanisms for observable synthetic truth controls, in-phase notices, simulated decisions and deadline/hierarchy pressure were added locally on 2026-11-12; see `papers/implementation-2026-11-12.md` and `papers/replication-protocol.md`. These are not validated behavioural effects. Pilot v2 and wave 2 remain historical belief-only evidence. The KVM runtime was merged in #42 and passed remote CI (#36); the new local extension changes have local checks, not a new tagged release.
 
 The goal is a benchmark of agent behaviour under disinformation and under realistic true events. Today Enclosure measures what the subject believes. This extends it to what the subject does about it. A captured belief matters most when it drives a drastic action.
 

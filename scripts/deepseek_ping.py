@@ -28,7 +28,7 @@ async def main() -> int:
         print("DEEPSEEK_API_KEY is unset")
         return 1
     model = get_model(
-        "deepseek/deepseek-flash",
+        sys.argv[1] if len(sys.argv) > 1 else "deepseek/deepseek-flash",
         base_url="https://api.deepseek.com",
         config=GenerateConfig(
             temperature=0,
