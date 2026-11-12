@@ -19,13 +19,57 @@ from enclosure.review import identity
 LOGS_DIR = Path("logs")
 
 
+def _allowed_log_dirs(root: Path) -> dict[str, Path]:
+    """Map relative and absolute names to directories already under *root*."""
+    root = root.resolve()
+    allowed: dict[str, Path] = {}
+
+    def add(resolved: Path, rel: str) -> None:
+        if not resolved.is_relative_to(root):
+            return
+        allowed[str(resolved)] = resolved
+        if rel in {"", "."}:
+            allowed[str(LOGS_DIR)] = resolved
+            allowed[LOGS_DIR.as_posix()] = resolved
+        else:
+            allowed[rel] = resolved
+            nested = LOGS_DIR / rel
+            allowed[str(nested)] = resolved
+            allowed[nested.as_posix()] = resolved
+
+    add(root, ".")
+    if root.is_dir():
+        for path in root.rglob("*"):
+            if not path.is_dir():
+                continue
+            resolved = path.resolve()
+            if not resolved.is_relative_to(root):
+                continue
+            add(resolved, resolved.relative_to(root).as_posix())
+    return allowed
+
+
 def constrain_log_directory(root: str, *, base: Path | None = None) -> Path:
-    """Resolve a user-supplied log path and keep it inside the logs directory."""
-    allowed = (base if base is not None else LOGS_DIR).resolve()
-    resolved = Path(root).expanduser().resolve()
-    if not resolved.is_relative_to(allowed):
-        raise ValueError(f"Log directory {root!r} must stay inside {allowed}")
-    return resolved
+    """Return an already-enumerated directory under logs, or reject.
+
+    User input is only used as a dictionary key into directories discovered
+    under logs. Nothing the caller supplies is opened or resolved.
+    """
+    allowed_root = (base if base is not None else LOGS_DIR).resolve()
+    name = str(root).strip()
+    if not name:
+        raise ValueError(f"Log directory {root!r} must stay inside {allowed_root}")
+    incoming = Path(name)
+    if any(part == ".." for part in incoming.parts):
+        raise ValueError(f"Log directory {root!r} must stay inside {allowed_root}")
+    allowed = _allowed_log_dirs(allowed_root)
+    chosen = allowed.get(name)
+    if chosen is None and not incoming.is_absolute():
+        rel = Path(*[part for part in incoming.parts if part not in {".", ""}]).as_posix()
+        chosen = allowed.get(rel) or allowed.get(str(LOGS_DIR / rel))
+    if chosen is None or not chosen.is_relative_to(allowed_root):
+        raise ValueError(f"Log directory {root!r} must stay inside {allowed_root}")
+    return chosen
 
 
 st.set_page_config(page_title="Enclosure", layout="wide")

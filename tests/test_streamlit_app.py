@@ -22,9 +22,11 @@ def _constrain_log_directory():
                 isinstance(target, ast.Name) and target.id == "LOGS_DIR" for target in node.targets
             ):
                 kept.append(node)
-        elif isinstance(node, ast.FunctionDef) and node.name == "constrain_log_directory":
+        elif isinstance(node, ast.FunctionDef) and node.name in {
+            "_allowed_log_dirs",
+            "constrain_log_directory",
+        }:
             kept.append(node)
-            break
     module = ast.Module(body=kept, type_ignores=[])
     ast.fix_missing_locations(module)
     namespace: dict[str, object] = {}
