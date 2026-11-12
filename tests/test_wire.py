@@ -194,10 +194,14 @@ def test_json_page_is_served_raw_with_its_media_type():
 
 def test_grid_t1_forum_is_discoverable_and_fetchable():
     from pathlib import Path
-    from urllib.parse import urlsplit
+    from urllib.parse import urlparse
 
     from enclosure.scenario import apply_scenario, load_spec
     from enclosure.world import World
+
+    def is_reddit(url: str | None) -> bool:
+        parsed = urlparse(url or "")
+        return parsed.scheme == "https" and parsed.hostname == "www.reddit.com"
 
     spec = load_spec(
         Path(__file__).resolve().parents[1] / "scenarios/wire/grid.yaml", treatment="T1"
@@ -205,8 +209,9 @@ def test_grid_t1_forum_is_discoverable_and_fetchable():
     world = World()
     apply_scenario(world, spec)
     hits = world.search("ercot energy emergency alert")
-    forum_hits = [hit for hit in hits if "reddit.com" in (hit.origin or "")]
+    forum_hits = [hit for hit in hits if is_reddit(hit.origin)]
     assert forum_hits
-    url = next(hit.url for hit in spec.search if "reddit.com" in hit.url)
-    parsed = urlsplit(url)
+    url = next(hit.url for hit in spec.search if is_reddit(hit.url))
+    parsed = urlparse(url)
+    assert parsed.scheme == "https" and parsed.hostname == "www.reddit.com"
     assert world.http_get(parsed.hostname, parsed.path) is not None

@@ -16,6 +16,18 @@ from enclosure.plots import (
 )
 from enclosure.review import identity
 
+LOGS_DIR = Path("logs")
+
+
+def constrain_log_directory(root: str, *, base: Path | None = None) -> Path:
+    """Resolve a user-supplied log path and keep it inside the logs directory."""
+    allowed = (base if base is not None else LOGS_DIR).resolve()
+    resolved = Path(root).expanduser().resolve()
+    if not resolved.is_relative_to(allowed):
+        raise ValueError(f"Log directory {root!r} must stay inside {allowed}")
+    return resolved
+
+
 st.set_page_config(page_title="Enclosure", layout="wide")
 st.title("Enclosure")
 st.caption("Belief, desk memo, and scores from a finished run.")
@@ -23,6 +35,7 @@ st.caption("Belief, desk memo, and scores from a finished run.")
 
 @st.cache_data(ttl=60)
 def load_rows(root: str) -> list[dict]:
+    log_dir = constrain_log_directory(root)
     rows = []
     annotations_path = Path("papers/labels/ai-adjudication-2026-11-12.json")
     annotations = (
@@ -30,7 +43,7 @@ def load_rows(root: str) -> list[dict]:
         if annotations_path.exists()
         else {}
     )
-    for path in sorted(Path(root).glob("*.eval")):
+    for path in sorted(log_dir.glob("*.eval")):
         log = read_eval_log(str(path))
         model = getattr(log.eval, "model", "") or ""
         source_sha = hashlib.sha256(path.read_bytes()).hexdigest()
@@ -102,7 +115,11 @@ root = st.text_input("Log directory", value=selected)
 st.caption(
     "Campaigns are shown separately. Historical prompts, runtimes and decoding can differ; label review may be incomplete."
 )
-rows = load_rows(root)
+try:
+    rows = load_rows(root)
+except ValueError as exc:
+    st.error(str(exc))
+    st.stop()
 if not rows:
     st.info("No .eval logs in that directory yet.")
     st.stop()
