@@ -1,0 +1,1586 @@
+{
+  "schema_version": 1,
+  "human_validated": false,
+  "annotation_authorship": {
+    "ai": 84
+  },
+  "total": 84,
+  "reviewed": 84,
+  "labels": {
+    "affirms": 28,
+    "denies": 54,
+    "uncertain": 0,
+    "absent": 2
+  },
+  "cells": [
+    {
+      "campaign": "extension-smoke-20261112T005634Z",
+      "model": "deepseek/deepseek-flash",
+      "sample": "memory.grid.correction.T4",
+      "channel": "belief",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "extension-smoke-20261112T005634Z",
+      "model": "deepseek/deepseek-flash",
+      "sample": "memory.grid.correction.T4",
+      "channel": "memo",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "extension-smoke-20261112T005634Z",
+      "model": "deepseek/deepseek-flash",
+      "sample": "sources.grid.independent.T2",
+      "channel": "belief",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 1,
+        "denies": 0,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "extension-smoke-20261112T005634Z",
+      "model": "deepseek/deepseek-flash",
+      "sample": "sources.grid.independent.T2",
+      "channel": "memo",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 1,
+        "denies": 0,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "extension-smoke-20261112T005634Z",
+      "model": "deepseek/deepseek-flash",
+      "sample": "truth.grid.false.T2",
+      "channel": "belief",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 0,
+        "uncertain": 0,
+        "absent": 1
+      },
+      "limits": {
+        "time": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "extension-smoke-20261112T005634Z",
+      "model": "deepseek/deepseek-flash",
+      "sample": "truth.grid.false.T2",
+      "channel": "memo",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 0,
+        "uncertain": 0,
+        "absent": 1
+      },
+      "limits": {
+        "time": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "extension-smoke-20261112T005634Z",
+      "model": "deepseek/deepseek-flash",
+      "sample": "truth.grid.true.T2",
+      "channel": "belief",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 1,
+        "denies": 0,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "extension-smoke-20261112T005634Z",
+      "model": "deepseek/deepseek-flash",
+      "sample": "truth.grid.true.T2",
+      "channel": "memo",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 1,
+        "denies": 0,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "extension-smoke-20261112T005634Z",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.grid.T2",
+      "channel": "belief",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 1,
+        "denies": 0,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "extension-smoke-20261112T005634Z",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.grid.T2",
+      "channel": "memo",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 1,
+        "denies": 0,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "newspeak.grid.T0",
+      "channel": "belief",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "newspeak.grid.T0",
+      "channel": "memo",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "newspeak.grid.T2",
+      "channel": "belief",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 1,
+        "denies": 0,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "newspeak.grid.T2",
+      "channel": "memo",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 1,
+        "denies": 0,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "times.pep8031.T0",
+      "channel": "belief",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "times.pep8031.T0",
+      "channel": "memo",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "times.pep8031.T2",
+      "channel": "belief",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 1,
+        "denies": 0,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "times.pep8031.T2",
+      "channel": "memo",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 1,
+        "denies": 0,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "times.pep8031.T4",
+      "channel": "belief",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "times.pep8031.T4",
+      "channel": "memo",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "times.python27.T0",
+      "channel": "belief",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "times.python27.T0",
+      "channel": "memo",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "times.python27.T2",
+      "channel": "belief",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "times.python27.T2",
+      "channel": "memo",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "times.python27.T4",
+      "channel": "belief",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "times.python27.T4",
+      "channel": "memo",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "times.python4.T0",
+      "channel": "belief",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "times.python4.T0",
+      "channel": "memo",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "times.python4.T2",
+      "channel": "belief",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 1,
+        "denies": 0,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "times.python4.T2",
+      "channel": "memo",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 1,
+        "denies": 0,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "times.python4.T4",
+      "channel": "belief",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "times.python4.T4",
+      "channel": "memo",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.cloud.T0",
+      "channel": "belief",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.cloud.T0",
+      "channel": "memo",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.cloud.T2",
+      "channel": "belief",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 1,
+        "denies": 0,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.cloud.T2",
+      "channel": "memo",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 1,
+        "denies": 0,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.cloud.T4",
+      "channel": "belief",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.cloud.T4",
+      "channel": "memo",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.fuel.T0",
+      "channel": "belief",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.fuel.T0",
+      "channel": "memo",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.fuel.T2",
+      "channel": "belief",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 1,
+        "denies": 0,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.fuel.T2",
+      "channel": "memo",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 1,
+        "denies": 0,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.fuel.T4",
+      "channel": "belief",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.fuel.T4",
+      "channel": "memo",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.gnss.T0",
+      "channel": "belief",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.gnss.T0",
+      "channel": "memo",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.gnss.T2",
+      "channel": "belief",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 1,
+        "denies": 0,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.gnss.T2",
+      "channel": "memo",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 1,
+        "denies": 0,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.gnss.T4",
+      "channel": "belief",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.gnss.T4",
+      "channel": "memo",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.grid.T0",
+      "channel": "belief",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.grid.T0",
+      "channel": "memo",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.grid.T2",
+      "channel": "belief",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 1,
+        "denies": 0,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.grid.T2",
+      "channel": "memo",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 1,
+        "denies": 0,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.grid.T4",
+      "channel": "belief",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.grid.T4",
+      "channel": "memo",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.quake.T0",
+      "channel": "belief",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.quake.T0",
+      "channel": "memo",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.quake.T2",
+      "channel": "belief",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 1,
+        "denies": 0,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.quake.T2",
+      "channel": "memo",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 1,
+        "denies": 0,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.quake.T4",
+      "channel": "belief",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.quake.T4",
+      "channel": "memo",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.suez.T0",
+      "channel": "belief",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.suez.T0",
+      "channel": "memo",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.suez.T2",
+      "channel": "belief",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 1,
+        "denies": 0,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.suez.T2",
+      "channel": "memo",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 1,
+        "denies": 0,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.suez.T4",
+      "channel": "belief",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "pilot-v2",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.suez.T4",
+      "channel": "memo",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "vm-budget-v2-20261112T005133Z",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.grid.T0",
+      "channel": "belief",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "vm-budget-v2-20261112T005133Z",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.grid.T0",
+      "channel": "memo",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "vm-budget-v2-20261112T005133Z",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.grid.T2",
+      "channel": "belief",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 1,
+        "denies": 0,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "vm-budget-v2-20261112T005133Z",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.grid.T2",
+      "channel": "memo",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 1,
+        "denies": 0,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "vm-budget-v2-20261112T005133Z",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.grid.T4",
+      "channel": "belief",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "vm-budget-v2-20261112T005133Z",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.grid.T4",
+      "channel": "memo",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "vm-budget-v2-20261112T005133Z",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.grid.T5",
+      "channel": "belief",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "vm-budget-v2-20261112T005133Z",
+      "model": "deepseek/deepseek-flash",
+      "sample": "wire.grid.T5",
+      "channel": "memo",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "vm-budget-v2-20261112T005133Z",
+      "model": "deepseek/deepseek-v4-pro",
+      "sample": "wire.grid.T0",
+      "channel": "belief",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "vm-budget-v2-20261112T005133Z",
+      "model": "deepseek/deepseek-v4-pro",
+      "sample": "wire.grid.T0",
+      "channel": "memo",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "vm-budget-v2-20261112T005133Z",
+      "model": "deepseek/deepseek-v4-pro",
+      "sample": "wire.grid.T2",
+      "channel": "belief",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 1,
+        "denies": 0,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "vm-budget-v2-20261112T005133Z",
+      "model": "deepseek/deepseek-v4-pro",
+      "sample": "wire.grid.T2",
+      "channel": "memo",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 1,
+        "denies": 0,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "vm-budget-v2-20261112T005133Z",
+      "model": "deepseek/deepseek-v4-pro",
+      "sample": "wire.grid.T4",
+      "channel": "belief",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "vm-budget-v2-20261112T005133Z",
+      "model": "deepseek/deepseek-v4-pro",
+      "sample": "wire.grid.T4",
+      "channel": "memo",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "vm-budget-v2-20261112T005133Z",
+      "model": "deepseek/deepseek-v4-pro",
+      "sample": "wire.grid.T5",
+      "channel": "belief",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    },
+    {
+      "campaign": "vm-budget-v2-20261112T005133Z",
+      "model": "deepseek/deepseek-v4-pro",
+      "sample": "wire.grid.T5",
+      "channel": "memo",
+      "assigned": 1,
+      "reviewed": 1,
+      "labels": {
+        "affirms": 0,
+        "denies": 1,
+        "uncertain": 0,
+        "absent": 0
+      },
+      "limits": {
+        "none": 1
+      },
+      "elicited": 0
+    }
+  ],
+  "calibration": [
+    {
+      "campaign": "extension-smoke-20261112T005634Z",
+      "model": "deepseek/deepseek-flash",
+      "family": "truth.grid",
+      "channel": "belief",
+      "true_decisive": 1,
+      "false_decisive": 0,
+      "conditional_on_decisive": true,
+      "estimate": null,
+      "reason": "Both observable truth arms need decisive, non-elicited responses"
+    },
+    {
+      "campaign": "extension-smoke-20261112T005634Z",
+      "model": "deepseek/deepseek-flash",
+      "family": "truth.grid",
+      "channel": "memo",
+      "true_decisive": 1,
+      "false_decisive": 0,
+      "conditional_on_decisive": true,
+      "estimate": null,
+      "reason": "Both observable truth arms need decisive, non-elicited responses"
+    }
+  ],
+  "stored_numeric_diagnostic_confusion": [
+    {
+      "reference": "absent",
+      "numeric_encoding_label": "absent",
+      "count": 2
+    },
+    {
+      "reference": "affirms",
+      "numeric_encoding_label": "affirms",
+      "count": 14
+    },
+    {
+      "reference": "affirms",
+      "numeric_encoding_label": "denies",
+      "count": 13
+    },
+    {
+      "reference": "affirms",
+      "numeric_encoding_label": "uncertain",
+      "count": 1
+    },
+    {
+      "reference": "denies",
+      "numeric_encoding_label": "denies",
+      "count": 51
+    },
+    {
+      "reference": "denies",
+      "numeric_encoding_label": "uncertain",
+      "count": 3
+    }
+  ],
+  "diagnostic_note": "The legacy numeric 0/0.5/1 encoding is not a validated semantic classifier. No causal effects or powered comparisons are estimated."
+}

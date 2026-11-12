@@ -22,7 +22,7 @@ jobs:
       - name: Install
         run: uv sync --group dev --locked
       - name: Lint
-        run: uv run ruff check src tests evals
+        run: uv run ruff check src tests evals scripts streamlit_app.py
       - name: Typecheck
         run: uv run mypy
       # Informational: 16 files are unformatted; a later PR formats them.
@@ -102,4 +102,4 @@ jobs:
       - name: VM acceptance
         env:
           ENCLOSURE_VM_TESTS: "1"
-        run: uv run pytest -q tests/test_vm_inspect.py
+        run: uv run pytest -q tests/test_vm_inspect.py tests/test_vm_interventions.py

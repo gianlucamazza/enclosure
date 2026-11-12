@@ -65,4 +65,54 @@ def test_delivery_failure_does_not_record_exposure():
     )[0]
     with pytest.raises(RuntimeError):
         asyncio.run(wrapped())
-    assert state == {}
+    assert state == {"value": {"count": 1, "delivered": []}}
+
+
+def test_completed_delivery_survives_second_failure_and_concurrent_calls():
+    state = {}
+    delivered = []
+
+    async def action():
+        return "done"
+
+    async def deliver(index, *args):
+        if index == 1:
+            raise RuntimeError("failed second notice")
+        delivered.append(index)
+
+    def save(value):
+        state["value"] = value
+
+    wrapped = wrap_tools(
+        [action],
+        {"notices": [{"after_actions": 1, "body": "one"}, {"after_actions": 1, "body": "two"}]},
+        get_state=lambda: state.get("value"),
+        set_state=save,
+        deliver=deliver,
+    )[0]
+    with pytest.raises(RuntimeError):
+        asyncio.run(wrapped())
+    assert state["value"] == {"count": 1, "delivered": [0]}
+    with pytest.raises(RuntimeError):
+        asyncio.run(wrapped())
+    assert delivered == [0]
+    assert state["value"]["count"] == 2
+
+    state.clear()
+
+    async def successful(*args):
+        delivered.append(args[0])
+
+    wrapped = wrap_tools(
+        [action],
+        {"notices": [{"after_actions": 1, "body": "one"}]},
+        get_state=lambda: state.get("value"),
+        set_state=save,
+        deliver=successful,
+    )[0]
+
+    async def concurrent():
+        await asyncio.gather(wrapped(), wrapped())
+
+    asyncio.run(concurrent())
+    assert state["value"] == {"count": 2, "delivered": [0]}

@@ -1,5 +1,6 @@
 """Experimenter view of Inspect logs: belief, memo, and scores."""
 
+import hashlib
 import json
 from pathlib import Path
 
@@ -7,11 +8,13 @@ import pandas as pd
 import streamlit as st
 from inspect_ai.log import read_eval_log
 
+from enclosure.analysis import comparison_group
 from enclosure.plots import (
     adoption_by_treatment,
     stated_vs_adopted,
     verification_vs_adoption,
 )
+from enclosure.review import identity
 
 st.set_page_config(page_title="Enclosure", layout="wide")
 st.title("Enclosure")
@@ -21,9 +24,16 @@ st.caption("Belief, desk memo, and scores from a finished run.")
 @st.cache_data(ttl=60)
 def load_rows(root: str) -> list[dict]:
     rows = []
+    annotations_path = Path("papers/labels/ai-adjudication-2026-11-12.json")
+    annotations = (
+        {a["record_id"]: a for a in json.loads(annotations_path.read_text())["records"]}
+        if annotations_path.exists()
+        else {}
+    )
     for path in sorted(Path(root).glob("*.eval")):
         log = read_eval_log(str(path))
         model = getattr(log.eval, "model", "") or ""
+        source_sha = hashlib.sha256(path.read_bytes()).hexdigest()
         for sample in log.samples or []:
             scores = sample.scores or {}
             value = next(iter(scores.values())).value if scores else {}
@@ -33,6 +43,19 @@ def load_rows(root: str) -> list[dict]:
             rows.append(
                 {
                     "log": path.name,
+                    "annotations": {
+                        channel: annotations.get(
+                            identity(
+                                path.parent.name,
+                                source_sha,
+                                str(model),
+                                str(sample.id),
+                                int(sample.epoch or 1),
+                                channel,
+                            )
+                        )
+                        for channel in ("belief", "memo")
+                    },
                     "model": model,
                     "scenario": meta.get("scenario", str(sample.id).rsplit(".", 1)[0]),
                     "factors": {
@@ -99,36 +122,25 @@ with st.expander("Run provenance and decoding"):
     st.json({"provenance": provenance or "unknown", "decoding": row["decoding"]})
 
 
-def comparison_group(item):
-    prov = item["provenance"]
-    if not prov:
-        return (item["log"],)
-    shared = {
-        key: prov.get(key)
-        for key in (
-            "commit",
-            "dirty",
-            "source_hashes",
-            "lock_sha256",
-            "scorer_sha256",
-            "images",
-            "runtime_config_sha256",
-        )
-    }
-    return (
-        item["model"],
-        item["scenario"],
-        json.dumps(item["factors"], sort_keys=True),
-        item["backend"],
-        json.dumps(item["decoding"], sort_keys=True),
-        json.dumps(shared, sort_keys=True),
-    )
-
-
 rows = [item for item in rows if comparison_group(item) == comparison_group(row)]
 st.caption(
     "Charts include only the selected scenario, model, factors, decoding and runtime provenance. Historical runs without provenance are shown one log at a time."
 )
+st.subheader("Annotated conclusions")
+st.table(
+    [
+        {
+            "channel": channel,
+            "label": annotation.get("label") if annotation else "not reviewed",
+            "authorship": annotation.get("reviewer_type") if annotation else "unknown",
+        }
+        for channel, annotation in row["annotations"].items()
+    ]
+)
+st.caption(
+    "AI annotations are exploratory and are not human validation. Missing labels are not denials."
+)
+st.subheader("Automated diagnostic scores")
 metrics = (
     "belief_adoption",
     "historical_mention",
@@ -172,7 +184,7 @@ else:
 adopted = adoption_by_treatment(
     [{"treatment": row["treatment"], "sample": row["sample"], **row["scores"]} for row in rows]
 )
-st.subheader("Adoption by treatment")
+st.subheader("Diagnostic adoption by treatment")
 if adopted:
     st.bar_chart(pd.DataFrame(adopted), x="treatment", y="adopted")
 else:
@@ -181,7 +193,7 @@ else:
 points = verification_vs_adoption(
     [{"treatment": row["treatment"], "sample": row["sample"], **row["scores"]} for row in rows]
 )
-st.subheader("Verification vs adoption")
+st.subheader("Diagnostic verification vs adoption")
 if points:
     st.scatter_chart(pd.DataFrame(points), x="verification", y="adopted")
 else:

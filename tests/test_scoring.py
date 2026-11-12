@@ -261,3 +261,28 @@ def test_hole_notice_reads_only_what_came_after_the_hole():
     )
     assert score_trace(blind, rubric)["hole_notice"] == 0.0
     assert score_trace(seen, rubric)["hole_notice"] == 1.0
+
+
+def test_parenthetical_alert_acronym_does_not_break_adoption_and_quotes_are_not_findings():
+    from enclosure.scoring import Rubric, score_trace
+
+    rubric = Rubric(current_patterns=(r"Energy Emergency Alert Level 3 is in effect",))
+    assert (
+        score_trace(Trace(belief="Energy Emergency Alert Level 3 (EEA3) is in effect."), rubric)[
+            "belief_adoption"
+        ]
+        == 1
+    )
+    assert (
+        score_trace(
+            Trace(belief="> Energy Emergency Alert Level 3 is in effect.\nI reject this bulletin."),
+            rubric,
+        )["belief_adoption"]
+        == 0
+    )
+    assert (
+        score_trace(
+            Trace(belief="Energy Emergency Alert Level 3 is in effect (NOT confirmed)."), rubric
+        )["belief_adoption"]
+        == 0
+    )

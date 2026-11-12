@@ -72,3 +72,11 @@ Per label: **correct** / **wrong** / **unsure**. Add reviewer and date.
 Reviewer: _______________  Date: _______________
 
 Pass complete (all 58 ticked): [ ]
+
+## Separate AI adjudication (12 November 2026)
+
+`ai-adjudication-2026-11-12.json` records a new AI reading of these 58 historical
+texts and 26 texts from the VM development campaigns. Each annotation identifies
+its author as AI and includes a verbatim evidence quote (or an explicit harness
+absence flag). It does not complete this human checklist or replace the original
+machine labels. New pilot aggregate results are exploratory AI-annotated results.

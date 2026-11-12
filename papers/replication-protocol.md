@@ -41,3 +41,12 @@ The action/belief gap still needs a validated semantic label at the time of the 
 Generate `scripts/review_bundle.py logs/pilot-v2 <new.json>` for all 58 texts. A human supplies reviewer/date/label/rationale; original machine labels remain unchanged. Use adjudication for disagreements and report confusion by class. No automatic process may certify the human pass.
 
 Use `scripts/export_logs.py <logs> <new-directory>` for redacted JSON review candidates. Known nested credentials are removed and their appearances in free text replaced. Unknown secrets can remain; publication requires inspection. Source-log SHA-256 preserves traceability. The JSON snapshot is not an Inspect `.eval` file.
+
+
+## Consolidation update
+
+See `papers/scientific-validation-2026-11-12.md` for the subsequent AI annotation
+policy and the shared-budget runner contract. The user delegated the 84-text pass
+to AI; it is not human validation. A human gold standard and powered confirmation
+remain outstanding. The earlier pilot accounting and limits above describe those
+historical development runs; they are not the current budget-script interface.

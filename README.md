@@ -235,7 +235,7 @@ Local inference goes through agent-runtime. One T0 sample:
 uv run inspect eval --run-config evals/local.yaml
 ```
 
-The committed `logs/wave-2` results used the historical container runtime. The commands below run the same treatment/decoding grid on the current VM backend (temperature 1, three epochs), not a reconstruction of that sitting. `flash` runs T0 and T2 on `grid` and `python27`; `grid-band` runs T1 and T3 on `grid`. Set `LOG_DIR` explicitly: the script still defaults to the historical directory ([#35](https://github.com/gianlucamazza/enclosure/issues/35)).
+The committed `logs/wave-2` results used the historical container runtime. The commands below run the same treatment/decoding grid on the current VM backend (temperature 1, three epochs), not a reconstruction of that sitting. `flash` runs T0 and T2 on `grid` and `python27`; `grid-band` runs T1 and T3 on `grid`. Set `LOG_DIR` explicitly: the script defaults to a timestamped directory and rejects historical archive paths.
 
 ```bash
 campaign_dir="logs/vm-wave-$(date -u +%Y%m%dT%H%M%SZ)"
@@ -277,7 +277,7 @@ Mechanism, dated decisions, and the validity notes live in `papers/experiment-lo
 
 The same machinery describes a way to capture agents that are actually in use. This repository stays a research instrument: models rather than people, brand and domain clones only on an internal network, and counterfactual status lines rather than exploits.
 
-The ten scenario files are synthetic counterfactuals that use real host names as test fixtures. See `scenarios/README.md`. `papers/labels/pilot-v2.yaml` is machine-generated and pending human review (`papers/labels/REVIEW.md`).
+The scenario files are synthetic counterfactuals that use real host names as test fixtures. See `scenarios/README.md`. `papers/labels/pilot-v2.yaml` is machine-generated and pending human review (`papers/labels/REVIEW.md`).
 
 
 ## Development extensions (12 November 2026)
@@ -308,7 +308,7 @@ true-event result is implied by these changes.
 
 ```bash
 uv run python scripts/review_bundle.py logs/pilot-v2 logs/review-human.json
-# Fill in labels, reviewer, ISO date and rationale, then:
+# Fill v2 label, reviewer_type, reviewer, ISO date, rationale and verbatim evidence_quote, then:
 uv run python scripts/check_review.py logs/review-human.json --labels-output logs/reviewed-labels.yaml
 uv run python scripts/judge_logs.py logs/pilot-v2 --labels logs/reviewed-labels.yaml
 # Export redacted JSON candidates for publication review (new directory):
@@ -336,3 +336,17 @@ criterion calculations; human label validation and a prespecified binary decisio
 rule are still required before reporting these as research findings.
 
 Development implementation, exact test results, live feasibility limits and conservative budget accounting: [12 November report](papers/implementation-2026-11-12.md).
+
+
+## Consolidation and annotation status
+
+The current [consolidation report](papers/scientific-validation-2026-11-12.md)
+records AI adjudication of 84 texts: 28 affirmations, 54 denials and 2 absent
+outputs. These annotations are exploratory AI analysis, not human validation.
+The original human-review checklist remains uncompleted. The false truth-control
+sample timed out, so d-prime and criterion are not estimated.
+
+Budget runners now default to dry run and share a durable cumulative ledger with
+the existing 1.27642592 USD conservative commitment already included. The 5 USD
+ceiling is not restarted for a new campaign. No additional paid calls are needed
+for consolidation. Use the commands and review schemas in the report above.
