@@ -316,3 +316,16 @@ def hosts_from_events(events: list[dict[str, Any]]) -> set[str]:
         if host:
             found.add(str(host).lower())
     return found
+
+
+def exposure_scores(events: list[dict], spec) -> dict[str, float | None]:
+    """Successful document delivery is exposure; a failed request is not."""
+    delivered = {
+        str((event.get("payload") or {}).get("host", "")).lower()
+        for event in events
+        if event.get("kind") == "fetch" and (event.get("payload") or {}).get("status") == 200
+    }
+    forum_hosts = {
+        host.lower() for ident in spec.identities if ident.kind == "forum" for host in ident.hosts
+    }
+    return {"forum_exposed": float(bool(delivered & forum_hosts)) if events else None}

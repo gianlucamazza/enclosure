@@ -330,3 +330,18 @@ def test_wire_episode_files_exist():
         assert (te.REPO / relative).is_file(), relative
     for relative in te.TIMES_PRIORS.values():
         assert (te.REPO / relative).is_file(), relative
+
+
+def test_wire_actions_and_scaffold_are_explicit():
+    task = te.wire(episode="grid", treatments="T2", actions=True, scaffold="provenance")
+    sample = list(task.dataset)[0]
+    assert sample.metadata["action_episode"] == "grid"
+    assert sample.metadata["scaffold"] == "provenance"
+    assert sample.metadata["backend"] == "vm"
+    assert "Trace the origin" in sample.input
+    assert "shed_load" in sample.input
+    assert sample.metadata["provenance"]["scenario_sha256"]
+    with pytest.raises(ValueError, match="Actions"):
+        te.wire(episode="suez", treatments="T2", actions=True)
+    with pytest.raises(ValueError, match="Unknown scaffold"):
+        te.wire(episode="grid", scaffold="bad")

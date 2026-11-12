@@ -16,7 +16,12 @@ BELIEF = f"{HOME}/belief.txt"
 BELIEF_KEY = "enclosure:belief"
 
 
-def subject_tools(search_host: str = "www.google.com", cast: list | None = None):
+def subject_tools(
+    search_host: str = "www.google.com",
+    cast: list | None = None,
+    action_episode: str = "",
+    interventions: dict | None = None,
+):
     roster = list(cast or [])
     tools = [
         fetch(),
@@ -30,8 +35,30 @@ def subject_tools(search_host: str = "www.google.com", cast: list | None = None)
         send_mail(),
         think(),
     ]
+    if action_episode:
+        tools.append(operator_console(action_episode))
     if roster:
         tools.extend([ask(roster), post(roster)])
+    if interventions and (
+        interventions.get("notices") or interventions.get("pressure", "none") != "none"
+    ):
+        from enclosure.interventions import wrap_tools
+
+        async def deliver(index, body, count):
+            await sandbox().write_file(f"{HOME}/mail/scheduled-{index}.txt", body)
+            await ministry_request(
+                "POST",
+                "/inner/act",
+                {"kind": "interruption", "index": index, "after_actions": count},
+            )
+
+        tools = wrap_tools(
+            tools,
+            interventions,
+            get_state=lambda: store().get("enclosure:interventions"),
+            set_state=lambda value: store().set("enclosure:interventions", value),
+            deliver=deliver,
+        )
     return tools
 
 
@@ -417,3 +444,46 @@ def _safe(path: str) -> str:
     if text != HOME and not text.startswith(HOME + "/"):
         raise ValueError("path must stay under /home/agent")
     return text
+
+
+def operator_console(episode: str):
+    from enclosure.decisions import Console
+
+    @tool
+    def console():
+        async def execute(verb: str, option: str, reason: str) -> str:
+            """Record an operator decision.
+
+            Args:
+                verb: propose, execute, escalate, or correct.
+                option: Desk option, or the recipient role for escalation.
+                reason: Evidence and justification for the decision.
+            """
+            key = "enclosure:console"
+            current = store().get(key)
+            state = Console(episode)
+            if current:
+                state.proposed = set(current["proposed"])
+                state.events = [dict(event) for event in current["events"]]
+            try:
+                event = state.act(verb, option, reason)
+            except ValueError as error:
+                return str(error)
+            try:
+                event["belief_at_decision"] = await sandbox().read_file(BELIEF)
+            except FileNotFoundError:
+                event["belief_at_decision"] = None
+            # Record before persisting so a transport failure cannot silently lose a decision.
+            await ministry_request("POST", "/inner/act", {"kind": "decision", **event})
+            store().set(key, {"proposed": sorted(state.proposed), "events": state.events})
+            return json.dumps(
+                {
+                    key: value
+                    for key, value in event.items()
+                    if key not in {"simulated", "belief_at_decision"}
+                }
+            )
+
+        return execute
+
+    return console()

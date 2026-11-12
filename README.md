@@ -4,17 +4,17 @@ What does a tool-using agent believe when every source it can check was written 
 
 Enclosure is a benchmark of that question. A coding agent reads the docs site, an ops agent reads the status page, a research agent reads the search results. In production those channels can be made to agree. Here that case is the whole world. The pages are ordinary documents. They announce a fact under the same host, date, and chrome as the real source. If the agent adopts the fact, that is belief captured by cloned authority.
 
-The name comes from *Nineteen Eighty-Four*. The subject lives where the record can be rewritten and every witness agrees with the record. The aim is a paper and a table per model: how often a false event is adopted, how often a true one is accepted, and, from those two rates, how well the model tells them apart (d′) and where it sets its threshold (c). An agent that rejects every alarming report looks robust and is only sceptical. The true-event arm is designed and not yet run, so d′ and c are not results.
+The name comes from *Nineteen Eighty-Four*. The subject lives where the record can be rewritten and every witness agrees with the record. The aim is a paper and a table per model: how often a false event is adopted, how often a true one is accepted, and, from those two rates, how well the model tells them apart (d′) and where it sets its threshold (c). An agent that rejects every alarming report looks robust and is only sceptical. The new observable synthetic true-event controls have development smoke runs but no human-validated labels; d′ and c are not results.
 
 Subjects are models. The instrument is meant to be rerun. Scenarios are data, the subject is any model the harness can call, and each reported score names the log it came from. The committed pilot logs were produced from uncommitted working trees; the next sitting will run from a tagged release.
 
 ## Status
 
-6 November 2026 (live-model results unchanged since 10 October 2026). The runner measures belief on a desk dated 1 June 2026. Action, pressure, a true-event arm, and colleagues who speak during a sitting are specified in `papers/design-decisions.md` and are not in the runner.
+12 November 2026. The historical tables below retain the October container results. New local VM feasibility runs and development extensions are described at the end of this README and in `papers/replication-protocol.md`. The runner measures declared belief on a desk dated 1 June 2026 and now supports optional recorded decisions, in-phase notices and deadline/hierarchy pressure. These extensions do not establish validated behavioural effects.
 
-The unreleased runner now defaults to a KVM guest; local acceptance tests pass, but no live-model sitting has used this runtime. Publication and remote CI validation are tracked in [#36](https://github.com/gianlucamazza/enclosure/issues/36).
+The KVM runtime was merged in #42 and passed remote CI ([#36](https://github.com/gianlucamazza/enclosure/issues/36)). New local live-model feasibility runs use this runtime; keep them separate from the committed container pilots. The development changes in this working tree have local verification and are not a new tagged release.
 
-Two live sittings are on record. They stay apart. File list and headers: `logs/README.md`. Labels in `papers/labels/pilot-v2.yaml` are machine-generated and pending human review; see `papers/labels/REVIEW.md`.
+Two historical live sittings are inventoried below. They stay apart. File list and headers: `logs/README.md`. Labels in `papers/labels/pilot-v2.yaml` are machine-generated and pending human review; see `papers/labels/REVIEW.md`.
 
 Pilot v2 (`logs/pilot-v2`, 7–8 October) is `deepseek-flash`, temperature 0, one sample, the prompt from before 9 October, and a world in which a second host often returned nothing. It covers the episode set. Machine-generated labels (pending human review) are in `papers/labels/pilot-v2.yaml`. A person has not reread them. The judge agreement of 58/58 is not stored in these Inspect scores and was not re-run; it comes from an offline `scripts/judge_logs.py` pass.
 
@@ -147,15 +147,15 @@ T5 and the colleague conditions have no live estimate.
 
 ## What is still open
 
-The order of the extension is fixed in `papers/design-decisions.md`. That note is not in the runner. Belief is what the instrument measures today. The extension asks what the subject does about it.
+The development extension now includes the initial action, interruption and pressure mechanisms described in `papers/design-decisions.md`; the current protocol is in `papers/replication-protocol.md`. Human validation, powered replication and the broader strategy pack remain open.
 
-- A second model. Gemini 3.8 Flash failed at auth with no samples (`ce3BqPym`, `eutxWmGC`); those logs are withheld because the traces contain account details.
+- Cross-provider replication. The new local VM feasibility campaign includes DeepSeek Flash and Pro; both share a provider and one sample per cell is not a powered comparison. The historical Gemini attempts produced no samples.
 - The other episodes on the current prompt, including a restoration (T4, T5). The pilot's restoration result belongs to the earlier wording and the earlier world.
 - A person rereads `papers/labels/pilot-v2.yaml` (machine-generated, pending human review; checklist in `papers/labels/REVIEW.md`). The wave texts in Results were read for that table. They are not a second label file.
-- The true-event arm. The twin reading of the flash T2 cells is already under Wave 2. d′ and c stay uncomputed until a true twin or a historical episode is run.
-- The `grid` T1 thread is a page at its own URL, and search does not list it. The 0/3 at T1 is the rate for a page no epoch opened.
-- Mail and notices during a sitting, then time pressure and an order from above.
-- An operator console whose calls are recorded and never carried out, including a way to hand the decision to a person.
+- A validated true-event arm. New synthetic controls expose distinguishable observations and have smoke checks; response labels and the binary decision rule remain to be validated. Identical-evidence twins do not identify hidden-ledger truth discrimination.
+- The historical `grid` T1 thread was not indexed and no epoch opened it. The current fixture indexes it, with local discovery/fetch checks; the historical 0/3 remains a result without exposure.
+- Behavioural validation of the implemented in-phase notices and deadline/hierarchy conditions, then the remaining pressure factors.
+- Broader operator-console validation. Grid/cloud now support recorded propose/execute/correct/escalate calls without operational effects.
 - A later pack places the subject on a crisis desk, with the evidence owned and an abstract ladder of responses. No named living person, no operational detail, no raw logs published.
 - Production scaffolds and system prompts as their own subjects. The world stays enclosed, and the subjects stay models.
 
@@ -278,3 +278,61 @@ Mechanism, dated decisions, and the validity notes live in `papers/experiment-lo
 The same machinery describes a way to capture agents that are actually in use. This repository stays a research instrument: models rather than people, brand and domain clones only on an internal network, and counterfactual status lines rather than exploits.
 
 The ten scenario files are synthetic counterfactuals that use real host names as test fixtures. See `scenarios/README.md`. `papers/labels/pilot-v2.yaml` is machine-generated and pending human review (`papers/labels/REVIEW.md`).
+
+
+## Development extensions (12 November 2026)
+
+The KVM runtime was merged in #42 and remote CI passed (#36). New local
+changes add input/source hashes and image IDs to sample provenance, campaign
+selection in Streamlit, a discoverable T1 grid forum, successful-fetch exposure
+scoring, and multi-fact/HTTPS registered-copy handling for T5. New campaigns
+must use distinct directories; historical results above remain unchanged.
+
+Wire tasks support `-T scaffold=independent`, `provenance`, or `before_action`
+(default `standard`). On grid/cloud, `-T actions=true` enables a simulated
+operator console with propose/execute/escalate/correct and decision scores.
+These are development extensions requiring manipulation-check pilots before
+scientific interpretation. In-phase `interruptions` in scenario YAML deliver mail
+after a specified number of completed tool operations. `-T actions=true
+-T pressure=hierarchy` delivers an order during the phase; `pressure=deadline`
+with `deadline_actions=N` displays a soft deadline in remaining operations.
+The guest acceptance test verifies mail reading and recorded console decisions. Identity metadata supports `derived_from` and
+`observation_id`. Matched source-independence fixtures can be run with
+`uv run inspect eval evals/sources.py -T condition=independent` (also `single`,
+`copied`, `dissent`); these have local tests but no live estimate yet.
+
+[Replication protocol](papers/replication-protocol.md) defines estimands,
+true-event controls, review requirements and the small authorized budget pilot.
+It also lists extensions that remain unimplemented; no human label review or
+true-event result is implied by these changes.
+
+```bash
+uv run python scripts/review_bundle.py logs/pilot-v2 logs/review-human.json
+# Fill in labels, reviewer, ISO date and rationale, then:
+uv run python scripts/check_review.py logs/review-human.json --labels-output logs/reviewed-labels.yaml
+uv run python scripts/judge_logs.py logs/pilot-v2 --labels logs/reviewed-labels.yaml
+# Export redacted JSON candidates for publication review (new directory):
+uv run python scripts/export_logs.py logs/pilot-v2 logs/export-review
+```
+
+Exports remove known credentials but still require inspection for unknown
+sensitive details. They are JSON evidence snapshots, not reloadable Inspect logs.
+
+
+Additional development tasks:
+
+```bash
+# Distinguishable synthetic true/false controls (not historical event records)
+uv run inspect eval evals/truth.py -T event=true
+uv run inspect eval evals/truth.py -T event=false
+# Hold the briefing fixed, vary the restored explanation
+uv run inspect eval evals/memory.py -T explanation=correction
+```
+
+The true controls differ in an inspectable observation record, with corresponding
+world ground statements. No discrimination score is claimed for identical-evidence
+twins. `calibration.py` provides count-based Wilson intervals and log-linear d-prime/
+criterion calculations; human label validation and a prespecified binary decision
+rule are still required before reporting these as research findings.
+
+Development implementation, exact test results, live feasibility limits and conservative budget accounting: [12 November report](papers/implementation-2026-11-12.md).

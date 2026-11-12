@@ -30,6 +30,8 @@ SCENARIOS_ENV = "ENCLOSURE_SCENARIOS"
 SUBJECT_KINDS = frozenset(
     {
         "a2a",
+        "decision",
+        "interruption",
         "shell",
         "python",
         "mail_out",

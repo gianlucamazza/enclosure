@@ -1,5 +1,6 @@
 """Experimenter view of Inspect logs: belief, memo, and scores."""
 
+import json
 from pathlib import Path
 
 import pandas as pd
@@ -33,12 +34,32 @@ def load_rows(root: str) -> list[dict]:
                 {
                     "log": path.name,
                     "model": model,
+                    "scenario": meta.get("scenario", str(sample.id).rsplit(".", 1)[0]),
+                    "factors": {
+                        key: meta.get(key)
+                        for key in (
+                            "scaffold",
+                            "action_episode",
+                            "pressure",
+                            "deadline_actions",
+                            "social",
+                            "authority_hint",
+                            "blind",
+                            "prior",
+                            "event_truth",
+                        )
+                    },
+                    "decoding": log.eval.model_generate_config.model_dump(mode="json")
+                    if log.eval.model_generate_config
+                    else {},
                     "sample": str(sample.id),
                     "treatment": str(meta.get("treatment", "")),
                     "blind": str(meta.get("blind", "")),
                     "prior": str(meta.get("prior", "")),
                     "authority_hint": str(meta.get("authority_hint", "")),
                     "scores": value,
+                    "provenance": meta.get("provenance", {}),
+                    "backend": meta.get("backend", "unknown (historical)"),
                     "answer": next(iter(scores.values())).answer if scores else "",
                     "timeline": (next(iter(scores.values())).metadata or {}).get("timeline", [])
                     if scores
@@ -48,7 +69,16 @@ def load_rows(root: str) -> list[dict]:
     return rows
 
 
-root = st.text_input("Log directory", value="logs/matrix")
+available = (
+    sorted(str(p) for p in Path("logs").iterdir() if p.is_dir() and any(p.glob("*.eval")))
+    if Path("logs").exists()
+    else []
+)
+selected = st.selectbox("Campaign", available) if available else "logs"
+root = st.text_input("Log directory", value=selected)
+st.caption(
+    "Campaigns are shown separately. Historical prompts, runtimes and decoding can differ; label review may be incomplete."
+)
 rows = load_rows(root)
 if not rows:
     st.info("No .eval logs in that directory yet.")
@@ -61,6 +91,44 @@ labels = [
 picked = st.selectbox("Sample", options=range(len(rows)), format_func=lambda i: labels[i])
 row = rows[picked]
 scores = row["scores"]
+provenance = row["provenance"]
+st.caption(
+    f"Runtime: {row['backend']} · Labels: {provenance.get('labels', 'unknown; not human-validated')}"
+)
+with st.expander("Run provenance and decoding"):
+    st.json({"provenance": provenance or "unknown", "decoding": row["decoding"]})
+
+
+def comparison_group(item):
+    prov = item["provenance"]
+    if not prov:
+        return (item["log"],)
+    shared = {
+        key: prov.get(key)
+        for key in (
+            "commit",
+            "dirty",
+            "source_hashes",
+            "lock_sha256",
+            "scorer_sha256",
+            "images",
+            "runtime_config_sha256",
+        )
+    }
+    return (
+        item["model"],
+        item["scenario"],
+        json.dumps(item["factors"], sort_keys=True),
+        item["backend"],
+        json.dumps(item["decoding"], sort_keys=True),
+        json.dumps(shared, sort_keys=True),
+    )
+
+
+rows = [item for item in rows if comparison_group(item) == comparison_group(row)]
+st.caption(
+    "Charts include only the selected scenario, model, factors, decoding and runtime provenance. Historical runs without provenance are shown one log at a time."
+)
 metrics = (
     "belief_adoption",
     "historical_mention",

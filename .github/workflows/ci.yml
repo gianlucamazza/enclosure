@@ -40,6 +40,18 @@ jobs:
           uv venv /tmp/enclosure-smoke
           uv pip install --python /tmp/enclosure-smoke/bin/python "$wheel"
           /tmp/enclosure-smoke/bin/enclosure --help
+          /tmp/enclosure-smoke/bin/python - <<'PY'
+          import os
+          import tempfile
+          os.chdir(tempfile.mkdtemp(prefix="enclosure-installed-"))
+          from enclosure.times_eval import wire
+          try:
+              wire(episode="grid", treatments="T0")
+          except FileNotFoundError as error:
+              assert "source checkout" in str(error), str(error)
+          else:
+              raise AssertionError("Standalone wheel must explain the checkout requirement")
+          PY
 
   docker-e2e:
     runs-on: ubuntu-latest

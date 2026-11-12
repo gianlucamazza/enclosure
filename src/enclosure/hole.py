@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from typing import Literal
+from urllib.parse import urlsplit
 
 from enclosure.workspace import maybe_sync
 from enclosure.world import World
@@ -50,7 +51,7 @@ def memory_hole(
             "restored_id": restored_id,
         }
         if mode == "deep":
-            record["deep_fs"] = _hole_derived_fs(world, doc)
+            record["deep_fs"] = _hole_derived_fs(world, doc, fact_id)
         touched.append(record)
 
     world.set_fact_injected(fact_id, False)
@@ -69,15 +70,17 @@ def memory_hole(
     }
 
 
-def _hole_derived_fs(world: World, http_doc) -> list[str]:
-    origin_key = f"http://{http_doc.host}{http_doc.path}"
+def _hole_derived_fs(world: World, http_doc, fact_id: str) -> list[str]:
     rewritten: list[str] = []
     for fs_doc in world.live_docs("fs"):
-        if fs_doc.origin != origin_key:
+        origin = urlsplit(fs_doc.origin or "")
+        if (
+            origin.scheme not in {"http", "https"}
+            or origin.hostname != http_doc.host
+            or (origin.path or "/") != http_doc.path
+        ):
             continue
-        predecessor = world.latest_without_fact(
-            "fs", None, fs_doc.path, http_doc.fact_ids[0] if http_doc.fact_ids else ""
-        )
+        predecessor = world.latest_without_fact("fs", None, fs_doc.path, fact_id)
         # If this file is a saved copy of the holed page, blank or restore.
         if predecessor is not None:
             world.make_live(predecessor.id)

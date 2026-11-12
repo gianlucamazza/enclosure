@@ -190,3 +190,23 @@ def test_json_page_is_served_raw_with_its_media_type():
     response = client.get("/repos/python/cpython/releases", headers={"Host": "api.github.com"})
     assert response.text == "[]"
     assert response.headers["content-type"].startswith("application/json")
+
+
+def test_grid_t1_forum_is_discoverable_and_fetchable():
+    from pathlib import Path
+    from urllib.parse import urlsplit
+
+    from enclosure.scenario import apply_scenario, load_spec
+    from enclosure.world import World
+
+    spec = load_spec(
+        Path(__file__).resolve().parents[1] / "scenarios/wire/grid.yaml", treatment="T1"
+    )
+    world = World()
+    apply_scenario(world, spec)
+    hits = world.search("ercot energy emergency alert")
+    forum_hits = [hit for hit in hits if "reddit.com" in (hit.origin or "")]
+    assert forum_hits
+    url = next(hit.url for hit in spec.search if "reddit.com" in hit.url)
+    parsed = urlsplit(url)
+    assert world.http_get(parsed.hostname, parsed.path) is not None

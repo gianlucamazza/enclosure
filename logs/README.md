@@ -4,15 +4,16 @@ Cited by the README Results. Inventory of the files in this tree. Dates, model, 
 
 ## Runtime provenance
 
-Every live-model log inventoried here is from the legacy container runtime.
-The locally verified, unreleased VM runtime has no live-model results in this
-directory. Mock acceptance logs are infrastructure tests, not additions to the
-model evidence. Keep new campaigns in a separate directory and record backend,
+The historical committed live-model logs inventoried below use the legacy
+container runtime. New local VM campaigns live in distinct ignored directories
+(`vm-budget-v2-*`, `extension-smoke-*`); they are feasibility data with pending
+human labels, not additions to the historical tables. Mock acceptance logs remain
+infrastructure checks. Keep new campaigns in a separate directory and record backend,
 code/scenario/prompt/scorer versions and decoding; see
 [#35](https://github.com/gianlucamazza/enclosure/issues/35).
 
-`run_wave.sh` still defaults to `logs/wave-2`. Override `LOG_DIR` for every new
-campaign; never use the committed pilot/wave directories as new output targets.
+`run_wave.sh` now defaults to a timestamped campaign directory. Never use the
+committed pilot/wave directories as new output targets.
 Raw new logs also require review before publication because metadata can carry
 control tokens ([#38](https://github.com/gianlucamazza/enclosure/issues/38)).
 

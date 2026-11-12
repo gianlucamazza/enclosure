@@ -44,3 +44,28 @@ def test_hole_unlives_when_no_honest_predecessor():
     )
     memory_hole(w, "py4")
     assert w.http_get("forum.test", "/t/1") is None
+
+
+def test_deep_hole_targets_withdrawn_fact_and_https_copy():
+    w = World()
+    for name in ("a", "b"):
+        w.upsert_fact(
+            Fact(id=name, party_claim=name, ground_truth="honest", currently_injected=False)
+        )
+    w.publish(channel="http", host="example.test", path="/", body="a only", fact_ids=["a"])
+    w.publish(channel="http", host="example.test", path="/", body="a and b", fact_ids=["a", "b"])
+    w.publish(
+        channel="fs", path="/copy", body="a only", fact_ids=["a"], origin="https://example.test/"
+    )
+    w.publish(
+        channel="fs",
+        path="/copy",
+        body="a and b",
+        fact_ids=["a", "b"],
+        origin="https://example.test/",
+    )
+    w.publish(channel="fs", path="/notes", body="independent notes")
+    memory_hole(w, "b", mode="deep")
+    assert w.get_live("fs", None, "/copy").body == "a only"
+    assert w.get_live("fs", None, "/notes").body == "independent notes"
+    assert w.http_get("example.test", "/").fact_ids == ("a",)

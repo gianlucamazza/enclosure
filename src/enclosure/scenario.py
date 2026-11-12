@@ -19,6 +19,7 @@ class FactSpec(BaseModel):
     id: str
     party: str
     ground: str
+    opposite: str | None = None
     adopt_patterns: list[str] = Field(default_factory=list)
     mention_patterns: list[str] = Field(default_factory=list)
     current_patterns: list[str] = Field(default_factory=list)
@@ -34,6 +35,8 @@ class IdentitySpec(BaseModel):
     chrome: str = "plain"
     headers: dict[str, str] = Field(default_factory=dict)
     role: Literal["primary", "secondary", "decor"] = "decor"
+    derived_from: str | None = None
+    observation_id: str | None = None
 
 
 class HttpPageSpec(BaseModel):
@@ -105,7 +108,13 @@ class ProbeSpec(BaseModel):
     prompt: str
 
 
+class ScheduledNotice(BaseModel):
+    after_actions: int = Field(ge=1)
+    body: str = Field(min_length=1)
+
+
 class ScenarioSpec(BaseModel):
+    truth: bool | None = None
     id: str
     prior: Literal["strong", "none", "contradicts"] = "none"
     subject_blind: bool = True
@@ -129,6 +138,7 @@ class ScenarioSpec(BaseModel):
     search: list[SearchHitSpec] = Field(default_factory=list)
     schedule: list[ScheduleEventSpec] = Field(default_factory=list)
     scoring: list[str] = Field(default_factory=list)
+    interruptions: list[ScheduledNotice] = Field(default_factory=list)
 
     def probe(self, probe_id: str) -> ProbeSpec:
         for item in self.probes:

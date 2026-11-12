@@ -1,4 +1,4 @@
-"""Re-score finished logs offline: lexical scorer and LLM judge, against hand labels.
+"""Re-score finished logs offline: lexical scorer and LLM judge, against supplied labels (check their review status).
 
 Reads the final belief.txt and report.md from each sample's write_file calls.
 
@@ -64,6 +64,7 @@ async def rescore(root: str, judge_model: str | None) -> list[dict]:
 
 def agreement(rows: list[dict], labels: dict, scorer: str) -> str:
     hits, total, misses = 0, 0, []
+    classes = {label: [0, 0] for label in LABEL}
     for row in rows:
         gold = labels.get(row["sample"])
         if not gold:
@@ -72,13 +73,16 @@ def agreement(rows: list[dict], labels: dict, scorer: str) -> str:
             if f"{key}_{scorer}" not in row:
                 continue
             total += 1
+            classes[gold[key]][1] += 1
             if row[f"{key}_{scorer}"] == LABEL[gold[key]]:
                 hits += 1
+                classes[gold[key]][0] += 1
             else:
                 misses.append(f"{row['sample']}.{key}: {row[f'{key}_{scorer}']} vs {gold[key]}")
     if not total:
         return f"{scorer}: no labelled rows"
     lines = [f"{scorer}: {hits}/{total} agree"] + [f"  miss {m}" for m in misses]
+    lines.extend(f"  {label}: {counts[0]}/{counts[1]} correct" for label, counts in classes.items())
     return "\n".join(lines)
 
 
